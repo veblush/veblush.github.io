@@ -1,0 +1,25 @@
+
+name: veblush
+description: 'blog for veblush, programmer'
+url: http://veblush.github.io
+permalink: /posts/:title/
+
+kramdown:
+  input: GFM
+
+theme:
+  disqus_shortname: veblush
+  google_analytics: UA-77522665-1
+
+sass:
+  sass_dir: _sass
+  style: :compressed
+
+gems:
+  - jekyll-sitemap
+
+# polyglot
+languages: ["en", "ko"]
+default_lang: "en"
+exclude_from_localization: ["javascript", "images", "css"]
+parallel_localization: false
