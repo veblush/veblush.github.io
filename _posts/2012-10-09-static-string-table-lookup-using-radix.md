@@ -7,6 +7,7 @@ categories:
 lang: ko
 ---
 
+
 ## 도입
 
 텍스트 문서에서 문자열을 읽어 이 문자열에 해당하는 숫자를 찾아 반환하는 코드를 만드는
@@ -42,16 +43,18 @@ Radix Tree 를 이용해 문자열 탐색을 하는 코드를 작성해 보았�
 로 표현해보면 다음과 같다.
 (Prefix Tree 는 테이블의 문자열을 받아들이는 DFA 와 비슷하게 생겼다.)
 
-[![](http://3.bp.blogspot.com/-LVGnmq6WGVs/UHDAJ1HzbII/AAAAAAAAAAw/RCbyEFkyT7E/s1600/CTest1.gv.png)](http://3.bp.blogspot.com/-LVGnmq6WGVs/UHDAJ1HzbII/AAAAAAAAAAw/RCbyEFkyT7E/s1600/CTest1.gv.png)
+![]({% asset_path CTest1.gv.png %})
 
 구성한 Prefix Tree 에서 자식이 1개인 노드들을 합쳐서 하나의 노드로줄이면 다음과 같은
 [Radix Tree](http://en.wikipedia.org/wiki/Radix_tree) 를 만들 수 있다.
 
-[![](http://4.bp.blogspot.com/-DTgTbqzNs4U/UHQJ2gtnVgI/AAAAAAAAACA/ytED2O_pIhw/s1600/CTest1_2.gv.png)](http://4.bp.blogspot.com/-DTgTbqzNs4U/UHQJ2gtnVgI/AAAAAAAAACA/ytED2O_pIhw/s1600/CTest1_2.gv.png)
+![]({% asset_path CTest1_2.gv.png %})
+
 Radix Tree 로 바로 코드를 만들 수 있는데 하기 전에 Radix Tree 를 살짝 변형해보자.
 "노드 분기는 문자로만 한다." 라는 제약을 만족시키는 Radix Tree 는 다음과 같다.
 
-[![](http://3.bp.blogspot.com/-AHOJ2e5c0Lk/UHDAKdvoHYI/AAAAAAAAAA4/g7URXzGoqfs/s1600/CTest2.gv.png)](http://3.bp.blogspot.com/-AHOJ2e5c0Lk/UHDAKdvoHYI/AAAAAAAAAA4/g7URXzGoqfs/s1600/CTest2.gv.png)
+![]({% asset_path CTest2.gv.png %})
+
 문자로만 분기를 허용하는 이유는 switch 문을 사용하기 위해서다.
 이제 얻어진 수정된 Radix Tree 를 가지고 parse 문을 만들어 보자.
 
@@ -101,7 +104,7 @@ memcmp 가 str\[n\]cmp 보다 컴파일러에 의한 최적화될 여지가 많�
 또한 길이 확인이 되었으므로 마지막 단계에 있었던 null 문자 확인 단계가 제거된다.
 길이 분기가 추가된 Tree 는 다음과 같다.
 
-[![](http://1.bp.blogspot.com/-ggPvv_eQF1Y/UHDtTL5v1MI/AAAAAAAAABQ/KOa697kgOsU/s1600/CTest3.gv.png)](http://1.bp.blogspot.com/-ggPvv_eQF1Y/UHDtTL5v1MI/AAAAAAAAABQ/KOa697kgOsU/s1600/CTest3.gv.png)
+![]({% asset_path CTest3.gv.png %})
 이 Tree 로 부터 코드 생성 룰은 앞서 만든 것과 유사하다. str\[n\]cmp 대신
 memcmp 를 사용하고 첫 분기에 문자열 길이를 확인 하는 정도다. 이 룰에
 따라 코드를 만들면 다음과 같다.
@@ -162,7 +165,7 @@ delimiter 에 의해 길이를 알 수 있고 애초에 std::basic_string 과 �
   따라서 항상 탐색이 성공하는 경우만을 대상으로 한다.
 
 측정 결과는 다음과 같다. 걸린 시간의 단위는 µs.
-[![](http://2.bp.blogspot.com/-ubDYbHZdm28/UHGFhO3tZrI/AAAAAAAAABw/v5SexcTJzEo/s1600/Benchmark.png)](http://2.bp.blogspot.com/-ubDYbHZdm28/UHGFhO3tZrI/AAAAAAAAABw/v5SexcTJzEo/s1600/Benchmark.png)
+![]({% asset_path Benchmark.png %})
 
 결과 해석
 
@@ -186,7 +189,8 @@ delimiter 에 의해 길이를 알 수 있고 애초에 std::basic_string 과 �
 
 측정 결과는 다음과 같다. 걸린 시간의 단위는 µs.
 
-[![](http://2.bp.blogspot.com/-3Ok7YoKciK8/UHQa1rux6dI/AAAAAAAAACQ/rwkIhLjB1Ik/s1600/Benchmark2.png)](http://2.bp.blogspot.com/-3Ok7YoKciK8/UHQa1rux6dI/AAAAAAAAACQ/rwkIhLjB1Ik/s1600/Benchmark2.png)
+![]({% asset_path Benchmark2.png %})
+
 결과 해석
 -   대부분 앞선 테스트와 이번 테스트의 결과가 비슷하다. 이는 입력
     데이터가 어떤 패턴을 보여도 비슷한 성능을 보임을 의미한다.

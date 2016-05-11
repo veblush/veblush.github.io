@@ -1,0 +1,28 @@
+digraph G {
+ranksep=0.2
+rankdir=LR
+size=3
+n0 [shape=box,label="Start" fontname="Consolas" fontsize=20]
+n1 [ label="" shape="circle" ]
+n0 -> n1 [label="a" fontname="Consolas" fontsize=20]
+n2 [ label="" shape="circle" ]
+n1 -> n2 [label="pp" fontname="Consolas" fontsize=20]
+n3 [ label="" shape="circle" ]
+n2 -> n3 [label="s" fontname="Consolas" fontsize=20]
+n4 [ label="2" shape="doublecircle" fontname="Consolas" fontsize=20 ]
+n3 -> n4 [label="\\0" fontname="Consolas" fontsize=20]
+n5 [ label="" shape="circle" ]
+n2 -> n5 [label="l" fontname="Consolas" fontsize=20]
+n6 [ label="1" shape="doublecircle" fontname="Consolas" fontsize=20 ]
+n5 -> n6 [label="e\\0" fontname="Consolas" fontsize=20]
+n7 [ label="" shape="circle" ]
+n0 -> n7 [label="b" fontname="Consolas" fontsize=20]
+n8 [ label="" shape="circle" ]
+n7 -> n8 [label="ana" fontname="Consolas" fontsize=20]
+n9 [ label="3" shape="doublecircle" fontname="Consolas" fontsize=20 ]
+n8 -> n9 [label="\\0" fontname="Consolas" fontsize=20]
+n10 [ label="" shape="circle" ]
+n8 -> n10 [label="n" fontname="Consolas" fontsize=20]
+n11 [ label="4" shape="doublecircle" fontname="Consolas" fontsize=20 ]
+n10 -> n11 [label="a\\0" fontname="Consolas" fontsize=20]
+}
