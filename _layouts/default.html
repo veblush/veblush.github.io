@@ -7,37 +7,52 @@
     <meta name="author" content="Esun Kim">
     <meta name="description" content="veblush, programmer.">
 
+    {% I18n_Headers https://veblush.github.io %}
+    {% capture langbaseurl %}{{site.baseurl}}{% if site.active_lang != site.default_lang %}/{{site.active_lang}}{% endif %}{% endcapture %}
+    
     <title>{{ page.title }}</title>
 
     <link rel="stylesheet" href="/css/main.css">
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }}" href="{{ site.url }}/feed.xml">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    
+    <style>
+        html { overflow-y :scroll }
+    </style>
   </head>
   <body>
-    <div class='container'>
-      <div class='header'>
-        <h1 class='title'><a id='top-home-link' href='/'>{{ site.name }}</a></h1>
-        <span class='links align-left'>
-          <a class='top-about-link' href='/'>Posts</a>
-          <a class='top-about-link' href='/about/'>About</a>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          {% for menu in site.menus %}
+            <a {% if page.url == menu.link %}style="font-weight: bold;"{% endif %}
+               {% for group in menu.groups %}
+                 {% if page.url contains group %}style="font-weight: bold;"{% endif %}
+               {% endfor %}
+               {% if page.url == menu.link %}style="font-weight: bold;"{% endif %}
+               class="top-about-link" href="{{ menu.link }}">
+              {{ menu.names[site.active_lang] }}
+            </a>
+          {% endfor %}
         </span>
-        <span class='links align-right'>
+        <span class="links align-right">
           {% for tongue in site.languages %}
-            <a {% if tongue == site.active_lang %}style="font-weight: bold;"{% endif %}" class='top-about-link' href="{% if tongue == site.default_lang %} {{site.baseurl}}{{page.url}} {% else %} {{site.baseurl}}/{{ tongue }}{{page.url}} {% endif %}">{{ tongue }}</a>
+            <a {% if tongue == site.active_lang %}style="font-weight: bold;"{% endif %} class="top-about-link" href="{% if tongue == site.default_lang %} {{site.baseurl}}{{page.url}} {% else %} {{site.baseurl}}/{{ tongue }}{{page.url}} {% endif %}">{{ tongue }}</a>
           {% endfor %}
         </span>
       </div>
 
-      <div class='site'>
+      <div class="site">
         {{ content }}
-      </div> <!-- /site -->
-
-      <div class='footer'>
-        Powered by <a href='http://jekyllrb.com'>Jekyll</a>.
-        Get this theme
-        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">here</a>.
       </div>
-    </div> <!-- /container -->
+
+      <div class="footer">
+        Feed via <a href="{{ "/feed.xml" | prepend: site.baseurl }}">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
     {% include analytics.html %}
   </body>
 </html>

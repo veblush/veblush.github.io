@@ -31,6 +31,7 @@ a:hover { text-decoration: underline; }
 
 .container > .header {
   padding: 20px 50px;
+  border-bottom: 1px dotted #808080;
 }
 
 .container > .header h1.title {
@@ -40,7 +41,7 @@ a:hover { text-decoration: underline; }
 
 .container > .header h1.title a { color: #666; text-decoration: none; }
 .container > .header h1.title a:hover { color: #222; }
-.container > .header .links { padding: 0 0 0 20px; }
+// .container > .header .links { padding: 0 0 0 20px; }
 
 .container > .header .links a {
   color: #888;
@@ -50,7 +51,7 @@ a:hover { text-decoration: underline; }
 
 .site { margin: 0 auto; padding: 20px 50px; }
 
-.site .posts { padding: 50px 0 0 0; }
+// .site .posts { padding: 50px 0 0 0; }
 .site .posts .month { color: #aaa; padding: 30px 0; }
 
 .site .posts .post-listing {

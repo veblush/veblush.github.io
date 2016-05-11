@@ -23,3 +23,15 @@ languages: ["en", "ko"]
 default_lang: "en"
 exclude_from_localization: ["javascript", "images", "css"]
 parallel_localization: false
+
+#menu
+menus:
+  - names:
+      en: Posts
+      ko: 글
+    link: /
+    groups: [ "/posts/", "/categories/" ]
+  - names:
+      en: About
+      ko: 소개
+    link: /about/

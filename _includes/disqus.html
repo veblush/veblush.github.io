@@ -3,6 +3,10 @@
 <div id="disqus_thread"></div>
 <script type="text/javascript">
   var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "{{ site.active_lang }}";
+  };
   function load_disqus()
   {
     disqus_loaded = true;

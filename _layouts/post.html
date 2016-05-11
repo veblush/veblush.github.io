@@ -2,89 +2,19 @@
 layout: default
 ---
 
-<div class='post'>
-  <h2 class='title'>{{ page.title }}</h2>
-  <p class='meta'>{{ page.date | date: "%Y-%m-%d" }}</p>
+<div class="post">
+  <h2 class="title">{{ page.title }}</h2>
+  <p class="meta">{{ page.date | date: "%Y-%m-%d" }}</p>
 
-  <div class='content'>
+  <div class="content">
   {{ content }}
   </div>
 
-  <div class='social-share'>
-    <a href="http://twitter.com/share" class="twitter-share-button" data-url="{{ site.url }}{{ page.url }}/" data-text="{{ page.title }}" data-via='veblush' data-count="horizontal">Share on Twitter</a>
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="{{ site.url }}{% if site.active_lang != site.default_lang %}/{{site.active_lang}}{% endif %}{{ page.url }}"
+       data-text="{{ page.title }}" data-via="veblush" data-count="horizontal">Share on Twitter</a>
   </div>
-
-  <div id='post-footer'>
-
-    <div id='author-bio'>
-      <div class='gravatar'>
-        <img src="http://www.gravatar.com/avatar/aacc51ad5803774a0b78114889d7b7c9?s=200">
-      </div>
-
-      <div class='bio'>
-        Hi there! I’m Esun Kim.
-        You can tweet to me at
-        <a href='https://twitter.com/veblush'>@veblush</a>.
-        <br>
-        <br>
-        <div class='links'>
-          <a id='bio-home-link' href='/'>Posts</a>
-          <a id='bio-about-link' href='/about/'>About</a>
-        </div>
-      </div>
-    </div>
-
-    <!--
-    <div class='subscribe'>
-      <p class='text-lg'>Want to receive new articles via email?</p>
-
-      <form action="https://feedburner.google.com/fb/a/mailverify"
-            class='subscribe-form clearfix' method="post" target="popupwindow"
-            onsubmit="window.open('https://feedburner.google.com/fb/a/mailverify?uri=veblush', 'popupwindow', 'scrollbars=yes,width=550,height=520');return true">
-        <input type="text" class='subscribe-email' name="email"
-               tabindex="0" placeholder="Enter your email" />
-        <input type="hidden" value="veblush" name="uri"/>
-        <input type="hidden" name="loc" value="en_US"/>
-        <input type="submit" value="Subscribe"
-               tabindex="1" class="subscribe-submit" />
-      </form>
-
-      <p class='text-sm'>
-        You can also subscribe using your feed reader using the
-        <a href="/feed.xml">atom feed</a>.
-      </p>
-    </div>
-    -->
-    
-    {% if false %}
-    <div id='prev-next-nav'>
-      <div class='prev'>
-        {% if page.previous.url %}
-        <a id='nav-prev-link' href='{{page.previous.url}}'>&laquo; {{page.previous.title}}</a>
-        {% endif %}
-      </div>
-
-      <div class='next'>
-        {% if page.next.url %}
-        <a id='nav-next-link' href='{{page.next.url}}'>{{ page.next.title }} &raquo;</a>
-        {% endif %}
-      </div>
-    </div>
-
-    <div id='related-posts'>
-      <h3>Found this article interesting? You should check out these:</h3>
-      <ul>
-        {% for post in site.related_posts limit:5 %}
-        {% assign index = forloop.index %}
-        <li>
-          <a id='related-posts-{{ index }}' href="{{ BASE_PATH }}{{ post.url }}">{{ post.title }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-  </div>
-
 
   {% include disqus.html %}
 
