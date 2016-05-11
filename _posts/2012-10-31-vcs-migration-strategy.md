@@ -15,7 +15,7 @@ lang: ko
 저장소 마이그레이션은 예전 저장소에서 새 저장소로 데이터를 옮기는 과정이다.
 이 과정은 아래의 그림과 같이 예전 저장소에 있는 파일과 로그를 익스포트하는 과정과 여기서 얻은 데이터를 새 저장소로 임포트하는 과정으로 이루어진다.
 
-[![](http://3.bp.blogspot.com/-GNDaruazx-w/UIxydwTLKxI/AAAAAAAAAGY/0ljl5pTfJ18/s1600/Repo.gv.png)](http://3.bp.blogspot.com/-GNDaruazx-w/UIxydwTLKxI/AAAAAAAAAGY/0ljl5pTfJ18/s1600/Repo.gv.png)
+![]({% asset_path Repo.gv.png %})
 
 특히 마이그래이션 작업은 두 저장소가 다른 버전 관리 시스템에 있을 때 까다로워진다.
 만약 두 시스템의 리비전 모델이 많이 다른 경우라면 더욱 그렇다.
@@ -33,7 +33,7 @@ subversion 으로 올 때는 적당한 시점에 mkdir 작업을 임의로 넣�
 
 설명을 위해 아래와 같은 예제 저장소 데이터를 가정하자. 
 
-[![](http://1.bp.blogspot.com/-Cy7NBYJLJE4/UIvW2o70_7I/AAAAAAAAAFo/ctLY_xg-k9M/s1600/Revision-A.gv.png)](http://1.bp.blogspot.com/-Cy7NBYJLJE4/UIvW2o70_7I/AAAAAAAAAFo/ctLY_xg-k9M/s1600/Revision-A.gv.png)
+![]({% asset_path Revision-A.gv.png %})
 
 가로축이 리비전 증가다. 리비전 1 부터 4 까지 총 4개의 리비전 변화가 있었다.
 저장소의 파일은 노드로 표시되고 "파일이름 &lt;내용&gt;" 형식으로 표현되어 있다.
@@ -71,7 +71,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 과거 이력은 모두 무시하고 현재 파일만 이동하는 전략이다.
 새 저장소에 옮겨진 리비전의 모습은 아래 그림과 같으며 과거 리비전에 대한 정보가 모두 사라졌음을 볼 수 있다.
 
-[![](http://4.bp.blogspot.com/-cSldwVu3COU/UIvW3Ddrp2I/AAAAAAAAAFw/CaQS5CQesQI/s1600/Revision-B.gv.png)](http://4.bp.blogspot.com/-cSldwVu3COU/UIvW3Ddrp2I/AAAAAAAAAFw/CaQS5CQesQI/s1600/Revision-B.gv.png)
+![]({% asset_path Revision-B.gv.png %})
 
 이 방법은 간단하다. 단순히 예전 저장소의 최신파일을 받아 새 저장소에 추가하는 것으로 충분하다.
 때문에 마이그레이션 비용이 가장 적고 그래서 많이 사용되는 방법이기도 하다.
@@ -88,7 +88,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 리비전 2, 4 시점의 파일은 정확히 남고 그 사이의 이력은 뭉게지는 것을 볼 수 있다.
 (banana 의 파일 내용이 yellow 에서 바로 black 이 되는 것이 한 예이다.)
 
-[![](http://4.bp.blogspot.com/-HdkVXxCTbRM/UIvW4GTPg4I/AAAAAAAAAF4/C1a2OWiWPeE/s1600/Revision-C.gv.png)](http://4.bp.blogspot.com/-HdkVXxCTbRM/UIvW4GTPg4I/AAAAAAAAAF4/C1a2OWiWPeE/s1600/Revision-C.gv.png)
+![]({% asset_path Revision-C.gv.png %})
 
 방법도 간단하다. 먼저 중요 포인트의 리비전에 해당하는 파일을 모두 받는다.
 이것을 리비전 별로 묶고 아래와 같은 절차를 밟는다.
@@ -114,7 +114,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 이 파일에 대한 이력만 추려서 새 저장소를 구성하면 아래와 같은 그림을 얻을 수 있다.
 이 방법은 현재 남아있는 파일의 이력이 남기 때문에 blame 등의 기능을 종전과 같이 그대로 사용할 수 있는 장점이 있다.
 
-[![](http://2.bp.blogspot.com/-zYfZExeDe44/UIvW4RX5h0I/AAAAAAAAAGA/2I-UHn1frw0/s1600/Revision-D.gv.png)](http://2.bp.blogspot.com/-zYfZExeDe44/UIvW4RX5h0I/AAAAAAAAAGA/2I-UHn1frw0/s1600/Revision-D.gv.png)
+![]({% asset_path Revision-D.gv.png %})
 
 구현은 예전 저장소에 있는 모든 파일들의 과거 이력을 얻는 것으로 시작한다.
 개별 이력을 얻는 것이 보통의 버전 관리 시스템은 빠르지 않기 때문에 파일이
@@ -144,7 +144,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 없다면 손이 많이 가는 작업이 될 가능성이 높다.
 만약 1:1 로 완벽하게 마이그레이션이 가능하다면 아래 그림처럼 예제와 동일한 로그가 새 저장소에 구축된다.
 
-[![](http://1.bp.blogspot.com/-Cy7NBYJLJE4/UIvW2o70_7I/AAAAAAAAAFo/ctLY_xg-k9M/s1600/Revision-A.gv.png)](http://1.bp.blogspot.com/-Cy7NBYJLJE4/UIvW2o70_7I/AAAAAAAAAFo/ctLY_xg-k9M/s1600/Revision-A.gv.png)
+![]({% asset_path Revision-A.gv.png %})
 
 방법은 기본적으로 간단하다. 예전 저장소의 변경 내용을 순서대로 새 저장소에 적용하면 된다.
 예전 저장소 모든 리비전 r 에 대해 순서대로
@@ -169,7 +169,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 기본적으로 최신 스냅샷을 사용하되 중요 파일에 대해서만 현재 파일의 변경 로그 유지 방법을 사용한다.
 아래 그림은 orange 에 대해서는 최신 스냅샷을 banana 에 대해서는 변경 로그 유지를 적용한 예이다.
 
-[![](http://3.bp.blogspot.com/-uHLIgfoQU5s/UI_WrnmSFeI/AAAAAAAAAG0/ru03dwQN_js/s1600/Revision-F.gv.png)](http://3.bp.blogspot.com/-uHLIgfoQU5s/UI_WrnmSFeI/AAAAAAAAAG0/ru03dwQN_js/s1600/Revision-F.gv.png)
+![]({% asset_path Revision-F.gv.png %})
 
 방법은 현재 파일 변경 로그 유지와 유사하다.
 중요 파일은 기존과 같게 동작하도록 하고 그렇지 않은 파일에 대해서 로그를 옮기지 않으면 된다.
@@ -183,7 +183,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 변경 로그 유지 기능을 사용해 최근 변경 로그를 유지 하는 방법이다.
 아래는 리비전 2, 4 를 주요 스냅샷으로 남기고 리비전 2 -&gt; 4 사이의 변경 로그를 유지한 예이다.
 
-[![](http://3.bp.blogspot.com/-catzGjlGz08/UI_WrAFzVtI/AAAAAAAAAGs/rBXDO0NI8xo/s1600/Revision-E.gv.png)](http://3.bp.blogspot.com/-catzGjlGz08/UI_WrAFzVtI/AAAAAAAAAGs/rBXDO0NI8xo/s1600/Revision-E.gv.png)
+![]({% asset_path Revision-E.gv.png %})
 
 방법은 마지막 리비전 직전까지는 주요 스냅샷과 동일하고 마지막 리비전 단계에서
 현재 파일의 변경 로그 유지 방법과 동일하다. 이 방법은 주요 스냅샷을 재구성할 수 있고

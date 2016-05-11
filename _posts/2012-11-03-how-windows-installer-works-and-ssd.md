@@ -7,8 +7,6 @@ categories:
 lang: ko
 ---
 
-## 도입
-
 업무 PC 에 80GB SSD 를 장착하고 Windows 7 와 작업에 필요한 소프트웨어를 설치하고
 디스크 여유 공간 확보 작업을 시작했다.
 C 드라이브로 사용하는 80GB SSD 가 OS + 작업 공간으로 쓰기에 빠듯해
@@ -35,14 +33,15 @@ C 드라이브로 사용하는 80GB SSD 가 OS + 작업 공간으로 쓰기에 �
 이 43GB 를 돈으로 환산하면 HDD 는 2천원인데 반해 SSD 는 6만원이나 된다.
 (2TB HDD, 80GB SSD 모두 11만원 기준)
 
-[![](http://4.bp.blogspot.com/-vaFKNeBnFlY/UJPAGeJO4kI/AAAAAAAAAHI/1OVTcwPAuMY/s1600/S_Space_1.png)](http://4.bp.blogspot.com/-vaFKNeBnFlY/UJPAGeJO4kI/AAAAAAAAAHI/1OVTcwPAuMY/s1600/S_Space_1.png)
+![]({% asset_path S_Space_1.png %})
 
 누가 이렇게 용량을 차지하나 봤더니 Windows 폴더가 28GB 로 1등이다.
 아니 왜 Windows 폴더가 28GB 나 하지? 설치는 DVD 1장으로도 되는데?
 라는 생각에 더 살펴보니 Windows 폴더 아래 Installer 폴더가 9.8GB,
 winsxs 폴더가 7.3GB 로 대부분의 용량을 차지하고 있었다.
 그래서 Installer 폴더를 더 열어보면,
-[![](http://3.bp.blogspot.com/-Tq0il9oTGKg/UJPBqzYwByI/AAAAAAAAAHQ/MPFMPrR6msc/s1600/S_Space_1b.png)](http://3.bp.blogspot.com/-Tq0il9oTGKg/UJPBqzYwByI/AAAAAAAAAHQ/MPFMPrR6msc/s1600/S_Space_1b.png)
+
+![]({% asset_path S_Space_1b.png %})
 
 Installer 폴더 바로 아래에 있는 msi, msp 확장자의 파일들이 4.6GB 를 차지하고 있고
 $PatchCache$ 폴더 아래에 있는 여러 폴더안에 있는 파일들이 5.2GB 를 차지하고 있었다.
@@ -50,11 +49,12 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 탐색기의 컬럼에 "제목" 필드를 추가하면 어떤 내용인지 알수 있는 정보를 볼 수 있다.
 (모든 파일이 다 나오는 것은 아니다.)
 
-[![](http://1.bp.blogspot.com/-4D4hSqxFTNI/UJSixycgCaI/AAAAAAAAAIo/I7__RlC9gxs/s1600/Installer_Files.png)](http://1.bp.blogspot.com/-4D4hSqxFTNI/UJSixycgCaI/AAAAAAAAAIo/I7__RlC9gxs/s1600/Installer_Files.png)
+![]({% asset_path Installer_Files.png %})
 
 Installer/$PatchCache$ 폴더 아래엔 Managed 폴더가 있고 그 아래 여러 폴더가 있다.
 그 중 하나의 폴더를 예로 살펴보면 다음과 같은 파일들을 볼 수 있다
-[![](http://2.bp.blogspot.com/-pLGty6jOtJc/UJPJLMInQbI/AAAAAAAAAIQ/yd-xXrP6fVQ/s1600/Patch_Files.png)](http://2.bp.blogspot.com/-pLGty6jOtJc/UJPJLMInQbI/AAAAAAAAAIQ/yd-xXrP6fVQ/s1600/Patch_Files.png)
+
+![]({% asset_path Patch_Files.png %})
 
 도대체 Installer 폴더는 어떤 용도의 폴더이길래 이런 파일들이 용량을 차지하고 있나 궁금해서 자료를 살펴보았다.
 
@@ -113,13 +113,13 @@ Windows Installer 는 윈도우용 프로그램을 설치/패치 해주는 시�
 이제 실행한 결과를 살펴보면 먼저 Installer 에 있는 msi, msp 파일들이 어떤 프로그램인지 알 수 있다.
 상위 6개를 보면 오피스, Visual Studio 의 패치 파일인 것을 알 수 있다.
 
-[![](http://1.bp.blogspot.com/-De4ADoCByQY/UJPI8TaPvFI/AAAAAAAAAH8/-o_mgckFfpo/s1600/WinstView_Report_3.png)](http://1.bp.blogspot.com/-De4ADoCByQY/UJPI8TaPvFI/AAAAAAAAAH8/-o_mgckFfpo/s1600/WinstView_Report_3.png)
+![]({% asset_path WinstView_Report_3.png %})
 
 실행한 결과 두 번째를 보면 Installer/$PatchCache$ 폴더의 하위에 있는 여러 폴더가
 어떤 프로그램을 위한 폴더인지 알 수 있다.
 상위 6개를 보면 역시 오피스, Visual Studio 를 위한 폴더임을 알 수 있다.
 
-[![](http://1.bp.blogspot.com/-LfJEBpcp_UY/UJPI83yTraI/AAAAAAAAAIE/GE54Xj5kIC4/s1600/WinstView_Report_4.png)](http://1.bp.blogspot.com/-LfJEBpcp_UY/UJPI83yTraI/AAAAAAAAAIE/GE54Xj5kIC4/s1600/WinstView_Report_4.png)
+![]({% asset_path WinstView_Report_4.png %})
 
 특히 $PatchCache$ 는 원래 프로그램의 최대 2배까지 커질 수 있어 용량이 어마어마하다.
 (2배인 이유는 RTM 파일, 서비스팩이 적용된 파일을 보관할 수 있기 때문이다)
@@ -127,14 +127,20 @@ Windows Installer 는 윈도우용 프로그램을 설치/패치 해주는 시�
 ## Windows Installer 의 PatchCache 삭제 및 기능 끄기
 
 $PatchCache$ 폴더는 삭제할 수 있다. 속시원하게 $PatchCache$ 폴더를 지워보자.
+
+```
 > rd /s /q %WINDIR%\\Installer\\$PatchCache$
+```
 
 그리고 Installer 가 이 폴더에 새로 데이터를 넣지 않도록 레지스트리 설정도 하자. ([MaxPatchCacheSize](http://msdn.microsoft.com/en-us/library/windows/desktop/aa369798(v=vs.85).aspx) 를 0 으로 설정하는 것으로 가능)
+
+```
 > reg add HKLM\\Software\\Policies\\Microsoft\\Windows\\Installer /v MaxPatchCacheSize /t REG\_DWORD /d 0 /f
+```
 
 이제 아래 그림처럼 Installer 폴더가 9.8GB 에서 5.2GB 줄어 4.6GB 가 된 것을 볼 수 있다.
 
-[![](http://3.bp.blogspot.com/-zGKJdo3MjYw/UJPGz88zTBI/AAAAAAAAAHk/hP68-hLNYmY/s1600/S_Space_2.png)](http://3.bp.blogspot.com/-zGKJdo3MjYw/UJPGz88zTBI/AAAAAAAAAHk/hP68-hLNYmY/s1600/S_Space_2.png)
+![]({% asset_path S_Space_2.png %})
 
 하지만 아쉽게도 Installer 폴더 아래에 있는 파일은 지울 수 없다.
 Windows Update 등에서 원격으로 받아올 수 있는건 필요할 때 마다 받아오거나
@@ -162,7 +168,7 @@ DLL Hell 을 해결하기 위한 시스템인 Windows Side by Side 가 사용�
 여기서 하드링크가 연결되어 있지 않은 2.8GB 중에서 용량 순으로 파일 순위를 보면 다음과 같다.
 (Size 는 해당 파일의 버전별 크기 총합. Count 는 버전 개수.)
 
-[![](http://3.bp.blogspot.com/-QJkbpUtPk4I/UJS7Lb62Z2I/AAAAAAAAAI8/mFPUIhyd6zc/s1600/WinsxsTop.png)](http://3.bp.blogspot.com/-QJkbpUtPk4I/UJS7Lb62Z2I/AAAAAAAAAI8/mFPUIhyd6zc/s1600/WinsxsTop.png)
+![]({% asset_path WinsxsTop.png %})
 
 인터넷 익스플로러, 윈도우 시스템, .NET 컴포넌트, MFC 파일등이 업데이트 될 때마다
 WinSxS 에 등록해 파일이 8~12 개씩 쌓여 용량을 많이 차지하고 있는 것을 볼 수 있다.

@@ -1,0 +1,30 @@
+digraph G {
+ranksep=0.1
+nodesep=0.1
+ratio="compress"
+s [ label="" shape="plaintext" ]
+n0 [ label="" shape="circle" ]
+n1 [ label="ws" shape="doublecircle" ]
+n2 [ label="-" shape="doublecircle" ]
+n3 [ label="(" shape="doublecircle" ]
+n4 [ label=")" shape="doublecircle" ]
+n5 [ label="*" shape="doublecircle" ]
+n6 [ label="/" shape="doublecircle" ]
+n7 [ label="+" shape="doublecircle" ]
+n8 [ label="Num" shape="doublecircle" ]
+n9 [ label="Num" shape="doublecircle" ]
+n10 [ label="Num" shape="doublecircle" ]
+s -> n0 [ label=" start"]
+n0 -> n1 [ label=" {ws}" ]
+n0 -> n2 [ label=" -" ]
+n0 -> n3 [ label=" (" ]
+n0 -> n4 [ label=" )" ]
+n0 -> n5 [ label=" *" ]
+n0 -> n6 [ label=" /" ]
+n0 -> n7 [ label=" +" ]
+n0 -> n8 [ label=" 0" ]
+n0 -> n9 [ label=" {digit}-0" ]
+n1 -> n1 [ label=" {ws}" ]
+n9 -> n10 [ label=" {digit}" ]
+n10 -> n10 [ label=" {digit}" ]
+}

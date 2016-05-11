@@ -222,6 +222,7 @@ print("a", "b", "c"); // c b a
 ```
 
 가변인자의 개수는 sizeof... 로 간단히 확인할 수 있다.
+
 ```cpp
 template<typename... Args>
 void count(Args... args) {

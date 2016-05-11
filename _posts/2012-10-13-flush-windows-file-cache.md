@@ -7,8 +7,6 @@ categories:
 lang: ko
 ---
 
-## 도입
-
 오랜만에 클라이언트 시동 시간을 줄이는 최적화 작업을 하면서 Cold Start 환경을 만들어야
 할 상황이 생겼다.
 (Cold Start 는 시동에 필요한 파일들이 캐시에 있지 않에 디스크로부터 파일 데이터를
@@ -38,7 +36,7 @@ lang: ko
 먼저 [Cacheset](http://technet.microsoft.com/en-us/sysinternals/bb897561.aspx)
 은 캐시 크기를 제어하는 유틸리티다. 
 
-[![](http://1.bp.blogspot.com/-MbJrMFTM0DY/UHa9u7-A01I/AAAAAAAAACg/jDmB1PzHYcY/s1600/CacheSet.png)](http://1.bp.blogspot.com/-MbJrMFTM0DY/UHa9u7-A01I/AAAAAAAAACg/jDmB1PzHYcY/s1600/CacheSet.png)
+![]({% asset_path CacheSet.png %})
 
 여기서 Clear 버튼을 누르면 캐시가 날아간다. 하지만 다 날아가지 않는다.
 여기에 윈도우 캐시 시스템의 미묘함을 볼 수 있다.
@@ -47,7 +45,7 @@ lang: ko
 Rammap 은 시스템 메모리의 사용 상태를 보는 유틸리티이다.
 거기에 유틸리티 기능으로 Empty 기능이 포함되어 있다.
 
-[![](http://2.bp.blogspot.com/-N2U2JaIG9KU/UHa-tWLJUuI/AAAAAAAAACo/d_qXZMS6xLA/s1600/RamMapEmpty.png)](http://2.bp.blogspot.com/-N2U2JaIG9KU/UHa-tWLJUuI/AAAAAAAAACo/d_qXZMS6xLA/s1600/RamMapEmpty.png)
+![]({% asset_path RamMapEmpty.png %})
 
 Empty - Empty Standby List 메뉴를 선택하면 캐시를 완전히 비울 수 있다.
 이 RamMap 은 Windows Vista 부터 사용할 수 있기 때문이 이 편리한 과정은
@@ -64,7 +62,7 @@ Windows Vista 부터 사용할 수 있다.
  캐시됨 = Standby + Modified.
  따라서 첫번째 Cacheset Clear 때 캐시됨 메모리가 늘어나는 것은 자연스러운 현상이다.)
 
-[![](http://3.bp.blogspot.com/-JcGksGJw_Jc/UHa_KtiAHjI/AAAAAAAAACw/XEq8J1OsiRo/s1600/CacheMemoryFlow.png)](http://3.bp.blogspot.com/-JcGksGJw_Jc/UHa_KtiAHjI/AAAAAAAAACw/XEq8J1OsiRo/s1600/CacheMemoryFlow.png)
+![]({% asset_path CacheMemoryFlow.png %})
 
 자 이제 부터 Cold Start 를 위해서는 이 방법을 쓰면 좋다.
 더 이상 시스템 재시작이나 메모리 과할당을 사용할 필요가 없다.
@@ -75,7 +73,7 @@ Windows Vista 부터 사용할 수 있다.
 먼저 윈도우의 파일 I/O 요청이 어떻게 동작하는지 Windows Internals 에 있는 도표를 통해 살펴보자.
 (Windows Internals 5th Edition, Chapter 10 Cache Manager, Figure 10-10)
 
-[![](http://1.bp.blogspot.com/-1YBHrWd77I0/UHbCHIh162I/AAAAAAAAADA/PlfoeYXxCck/s1600/Internals.png)](http://1.bp.blogspot.com/-1YBHrWd77I0/UHbCHIh162I/AAAAAAAAADA/PlfoeYXxCck/s1600/Internals.png)
+![]({% asset_path Internals.png %})
 
 간단히 정리하면 윈도우의 파일 I/O 요청은 다음과 같은 순서로 수행된다.
 - File I/O 요청이 들어오면 파일 시스템 드라이버가 캐시 매니저에게 데이터를 요청한다.
@@ -102,7 +100,7 @@ Standby 메모리를 바로 넘겨준다. 일종의 2차 캐시 역할을 하는
 
 Rammap 을 사용하면 어떤 파일이 Standby 상태로 메모리에 올라와 있는지 볼 수 있다.
 
-[<img src="http://3.bp.blogspot.com/-_dArM4kzj8M/UHbFFy2EpoI/AAAAAAAAADQ/gwaxn411NUo/s400/Rammap2.png" width="400" height="200" />](http://3.bp.blogspot.com/-_dArM4kzj8M/UHbFFy2EpoI/AAAAAAAAADQ/gwaxn411NUo/s1600/Rammap2.png)
+![]({% asset_path Rammap2.png %})
 
 이런 이유로 Cache 워킹셋을 비우고 Standby 메모리도 비워야 캐시가 완전히 빈 상태를 만들 수 있는 것이다.
 
@@ -146,12 +144,13 @@ NtSetSystemInformation(
 
 Windows Vista 이후로는 간단히 유틸리티를 사용해 Cold Start 환경을 만들어 낼 수 있다.
 자주 필요한 기능은 아니지만 좀 더 편해져서 좋다!
+
 다음은 Windows 7 부터 추가된 리소스 매니저의 모습이다.
 (참고로 작업 관리자와 리소스 매니저에 표시되는 값의 의미는
  [Measuring memory usage in Windows 7](http://brandonlive.com/2010/02/21/measuring-memory-usage-in-windows-7/)
  에 잘 정리되어 있다.)
 
-[![](http://2.bp.blogspot.com/-ZTyb6CIYDGE/UHbGBPlgXII/AAAAAAAAADY/xymytKCKcWc/s1600/FunnyModified.png)](http://2.bp.blogspot.com/-ZTyb6CIYDGE/UHbGBPlgXII/AAAAAAAAADY/xymytKCKcWc/s1600/FunnyModified.png)
+![]({% asset_path FunnyModified.png %})
 
 한글판와 영문판을 위/아래로 붙여봤는데 Modified 가 수정한 날짜,
 Standby 가 대기 모드로 번역된 한글판 윈도우가 참 인상적이다. :)

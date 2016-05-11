@@ -1,0 +1,40 @@
+digraph G {
+
+rankdir=LR
+ranksep="0.3 equally"
+size=4.2
+
+node [ shape="box" fontname="Helvetica"] 
+edge [ fontname="Helvetica-Bold" ]
+
+node [shape="box" group=h]
+h2 -> h3 [label="A" fontcolor="green"]
+h3 -> h4 [label="M"]
+h2 [ shape="none" label = "" ]
+h3 [ label = "orange\n<yellow>" ]
+h4 [ label = "orange\n<red>" ]
+
+node [shape="box" group=g ]
+g0 -> g2 [label="A" fontcolor="green"]
+g2 -> g3 [label="M"]
+g3 -> g4 [label="M"]
+g0 [ shape = "none" label = ""]
+g2 [ label = "banana\n<yellow>" ]
+g3 [ label = "banana\n<brown>" ]
+g4 [ label = "banana\n<black>" ]
+
+node [shape="box" group=f]
+f0 -> f2 [label="A" fontcolor="green"]
+f2 -> f4 [label="D" fontcolor="red"]
+f0 [ shape = "none" label = "" ]
+f2 [ label = "apple\n<red>" ]
+f4 [ label = "" style="dotted" ]
+
+node [shape="plaintext" fontname="Times-Italic"]
+"r.0" -> "r.1" -> "r.2" -> "r.3" -> "r.4"
+
+{ rank=same f0 g0 "r.0" }
+{ rank=same f2 g2 h2 "r.2" }
+{ rank=same f4 g4 h4 "r.4" }
+
+}

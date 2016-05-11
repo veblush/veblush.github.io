@@ -7,8 +7,6 @@ categories:
 lang: ko
 ---
 
-## 도입
-
 작년에 있었던 팀의 서버 프로그램은 윈도우, 리눅스 양쪽에서 실행 가능했다.
 윈도우에서는 Visual C++ 를 리눅스에서는 gcc 를 사용해서 빌드를 했다.
 팀내 빌드, 테스트 시나리오는 다음과 같다.
@@ -45,7 +43,7 @@ cmake, scons 가 대표적인 멀티 플랫폼 빌드 시스템이다.
 이렇게 하면 프로젝트 파일을 하나만 유지할 수 있어서 원래 해결하려 했던 문제가 자연스럽게 해결된다.
 또한 새 시스템을 도입하는 것이 아니니 큰 학습 비용 없이 적응해 사용할 수 있다. 자 그럼 어떻게 할까?
 
-[![](http://1.bp.blogspot.com/-gxSjcLZpXuk/UH6tIMkwfyI/AAAAAAAAADw/Fv0m9K6J2Dw/s1600/GNU-VS.jpg)](http://1.bp.blogspot.com/-gxSjcLZpXuk/UH6tIMkwfyI/AAAAAAAAADw/Fv0m9K6J2Dw/s1600/GNU-VS.jpg)
+![]({% asset_path GNU-VS.jpg %})
 
 ## Make, the Legacy
 
@@ -120,7 +118,8 @@ exe : $(OBJS)
 C/C++ 은 cpp 파일 뿐 아니라 #include 헤더가 변경되어도 재컴파일을 해야 하는데 이 부분이 빠져있다.
 (예를 들어 main.cpp 가 lib.h 를 #include 하고 있다면 lib.h 가 변경되어도 main.cpp 가
  재컴파일이 되어야 한다. 따라서 저 위 main.o 룰의 prerequisite 은 main.cpp lib.h 가 되어야 한다)
-이 부분이 make 의 까다로운 부분인데 make 스스로 할 수 없으므로 (언어 종속적이라)
+
+ 이 부분이 make 의 까다로운 부분인데 make 스스로 할 수 없으므로 (언어 종속적이라)
 보통 makedep 과 같은 외부 프로그램을 사용해 makefile 파일 뒷부분에 dependency 룰을
 추가하는 방식으로 동작한다. (make dep 이 그 과정을 수행한다)
 반면 Visual C++ 의 경우 이 과정이 숨겨져 있어 자연스럽게 프로그래머는 이 부분을 신경쓰지 않아도 된다.

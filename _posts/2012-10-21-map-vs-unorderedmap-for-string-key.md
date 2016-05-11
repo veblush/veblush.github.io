@@ -13,7 +13,7 @@ map 은 Red-Black Tree 를 사용해 키의 순서를 유지하는 반면 unored
 unordered_map 은 키의 순서를 유지할 필요가 없기 때문에 탐색 속도등에 유리한 점을 가질 수 있다.
 (아래 그림 좌: Red-Black Tree, 우: Separate Chaining Hash Table)
 
-[<img src="http://4.bp.blogspot.com/-yCIv3lExcZo/UIJSZy4zu8I/AAAAAAAAAE4/9fhPNoAWixY/s400/RbHash.png" width="400" height="111" />](http://4.bp.blogspot.com/-yCIv3lExcZo/UIJSZy4zu8I/AAAAAAAAAE4/9fhPNoAWixY/s1600/RbHash.png)
+![]({% asset_path RbHash.png %})
 
 데이터가 N 개일 때 map 은 O(lgN) 의 탐색 속도를 보이고 unordered_map 은 O(1) 의 탐색 속도를 보인다.
 때문에 데이터가 많을 수록 unordered_map 이 속도에 유리한데 문제는 "언제부터 유리한가?" 이다.
@@ -64,7 +64,7 @@ Test<T>
 그 결과는 다음과 같다. (실행 환경: Intel i7-3550 3.3GHz, Windows 7 SP1, VC++ 10 SP1)
 X 축은 데이터 크기 N, Y 축은 탐색 1회에 걸린 시간 µs 이다.
 
-[![](http://3.bp.blogspot.com/-hcK37D_xkX0/UIILyH_7AaI/AAAAAAAAAEA/A2NsJeVKYdQ/s1600/Graph01.png)](http://3.bp.blogspot.com/-hcK37D_xkX0/UIILyH_7AaI/AAAAAAAAAEA/A2NsJeVKYdQ/s1600/Graph01.png)
+![]({% asset_path Graph01.png %})
 
 먼저 map은 O(lgN) 의 형태를 보이는 것을 알 수 있다.
 다만 128~512 구간에서 급격히 느려지는데 이는 캐시 미스의 영향으로 보인다.
@@ -139,18 +139,15 @@ Test<T>
 결과는 아래와 같다. M 이 4, 8, 12, 16 의 경우를 테스트했고 X 축은 데이터 크기 N 이고
 Y 축은 탐색 1회에 걸린 시간 µs 이다.
 
-[<img src="http://2.bp.blogspot.com/-DxuNazVQuAc/UIIMAHBQKjI/AAAAAAAAAEI/NnG6Q7VBAj8/s200/Graph02-1.png" width="200" height="140" />](http://2.bp.blogspot.com/-DxuNazVQuAc/UIIMAHBQKjI/AAAAAAAAAEI/NnG6Q7VBAj8/s1600/Graph02-1.png) 
-[<img src="http://4.bp.blogspot.com/-gUj47vMBVQo/UIIMArY0vzI/AAAAAAAAAEQ/EPenrvj0mJA/s200/Graph02-2.png" width="200" height="141" />](http://4.bp.blogspot.com/-gUj47vMBVQo/UIIMArY0vzI/AAAAAAAAAEQ/EPenrvj0mJA/s1600/Graph02-2.png)
-
-[<img src="http://3.bp.blogspot.com/-bDcB5Hvf3qE/UIIMBH1Zg5I/AAAAAAAAAEY/qDGHQ8Aa4QA/s200/Graph02-3.png" width="200" height="141" />](http://3.bp.blogspot.com/-bDcB5Hvf3qE/UIIMBH1Zg5I/AAAAAAAAAEY/qDGHQ8Aa4QA/s1600/Graph02-3.png)
-[<img src="http://1.bp.blogspot.com/-sZqocDXTuA8/UIIMBuzRu1I/AAAAAAAAAEg/ERPesA2c0gE/s200/Graph02-4.png" width="200" height="141" />](http://1.bp.blogspot.com/-sZqocDXTuA8/UIIMBuzRu1I/AAAAAAAAAEg/ERPesA2c0gE/s1600/Graph02-4.png)
+![]({% asset_path Graph02-1.png %}) ![]({% asset_path Graph02-2.png %})
+![]({% asset_path Graph02-3.png %}) ![]({% asset_path Graph02-4.png %})
 
 기본적으로 정수가 키인 경우와 비슷한 결과를 보인다.
 하지만 M 의 크기 변화에 따라 재미있는 현상이 발생하는데 map 과 unordered_map 의 성능이
 교차하는 점이 M 이 커짐에 따라 같이 커지는 현상이다. 이를 좀 더 잘 보기위해
 M 에 따라 map 탐색시간 / unordered_map 탐색시간 비율 그래프를 아래와 같이 그려봤다.
 
-[<img src="http://2.bp.blogspot.com/-PzMrrWyjPeU/UIIMB3z1sBI/AAAAAAAAAEk/T2noyzYZ0uo/s320/Graph02.png" width="320" height="207" />](http://2.bp.blogspot.com/-PzMrrWyjPeU/UIIMB3z1sBI/AAAAAAAAAEk/T2noyzYZ0uo/s1600/Graph02.png)
+![]({% asset_path Graph02.png %})
 
 M=4 일때 ratio 가 1이 되는 지점은 N=128~256 지점이고
 M=16 일때 ratio 가 1이 되는 지점은 N=512~1024 지점이다.
@@ -180,7 +177,7 @@ unordered_map: 
 
 map 의 노드 마다 문자열을 비교하는 부분의 시간 복잡도를 구해보자.
 map 을 구성하는 트리가 완전하게 균형된 트리를 구축했다고 했을 때 M=4 의 트리는 다음과 같은 형태를 가진다.
-[![](http://3.bp.blogspot.com/-L2v6-iYj1Hk/UIKaQPt30zI/AAAAAAAAAFI/MlNrK9QgOMg/s1600/Tree.gv.png)](http://3.bp.blogspot.com/-L2v6-iYj1Hk/UIKaQPt30zI/AAAAAAAAAFI/MlNrK9QgOMg/s1600/Tree.gv.png)
+![]({% asset_path Tree.gv.png %})
 
 먼저 키로 받은 데이터 분포 특성에 의해 d=0 노드는 첫 글자 만으로 분기가 가능하다.
 이 부분이 중요한데 노드 분기를 위해 문자 M 을 모두 비교할 필요가 없기 때문이다.

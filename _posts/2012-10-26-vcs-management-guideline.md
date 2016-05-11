@@ -11,7 +11,7 @@ lang: ko
 버전 관리 시스템은 이제 개발에 필수 요수가 되었다.
 이 시스템을 사용하기 전엔 도대체 어떻게 개발을 했나 싶을 정도다.
 
-[![](http://1.bp.blogspot.com/-5f0PD-Q47mE/UIfk6uRVVOI/AAAAAAAAAFY/gIr3etiFDhI/s1600/HgSvnGit.png)](http://1.bp.blogspot.com/-5f0PD-Q47mE/UIfk6uRVVOI/AAAAAAAAAFY/gIr3etiFDhI/s1600/HgSvnGit.png)
+![]({% asset_path HgSvnGit.png %})
 
 이제는 사용 요령이나 유용한 팁들이 많아 시스템 사용에 큰 어려움이 없이 잘 쓰지만
 정리 차원에서 저장소 관리 가이드라인을 적어본다.

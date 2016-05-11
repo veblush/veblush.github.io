@@ -21,11 +21,13 @@ yacc, bison, antlr 모두 그러한 형태를 기본 방법으로 사용하고 �
 하지만 특정 언어 환경에서만 사용할 수 있는 제약이 생기는 것은 어쩔 수 없는데
 pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있다.
 만약 언어 파싱을 C++, Python 에서 동시에 사용해야 한다면 이는 문제가 된다.
+
 이런 와중에 [GOLD Parser](http://goldparser.org/) 는 파싱하고자 하는 언어의 문법을
 파싱할 수 있는 데이터를 익스포트 하고 이를 각자의 환경에서 사용하는 방식을 사용한다.
 기본적인 파싱 데이터인 DFA 테이블과 LALR 테이블을 익스포트 하고 이후 파싱 작업은
 각 언어 마다 개별적으로 구현한 [파싱 엔진](http://goldparser.org/engine/index.htm)에 위임한다.
 파싱 엔진은 여러 언어마다 개별 개발자들이 만들어 두었다.
+
 언어 문법과 파싱에서의 사용을 분리했는데 나름 괜찮은 시도인 것 같아 사용해보았다.
 (이런 접근은 GOLD Parser 말고는 그다지 많이 사용되고 있지 않다.
  [SableCC](http://sablecc.org/) 가 부분적으로 이 기능을 지원한다.)
@@ -38,18 +40,18 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 테스트 작성 및 (그래도 친절한) 문법 오류 안내를 지원한다.
 보통의 파서 생성기는 이러한 도구가 없거나 부실해 그 환경에 익숙해지지 않으면 사용하기 어렵다.
 
-[<img src="http://3.bp.blogspot.com/-LHc7PoTv04I/UMMHp8v9TOI/AAAAAAAAAJs/aW7JaTU9J4I/s400/gold_parser.png" width="400" height="257" />](http://3.bp.blogspot.com/-LHc7PoTv04I/UMMHp8v9TOI/AAAAAAAAAJs/aW7JaTU9J4I/s1600/gold_parser.png)
+![]({% asset_path gold_parser_1.png %})
 
 문법을 작성하면서 작성된 문법을 테스트 할 수 있다.
 테스트 하고자 하는 문자열을 입력하고 이 문자열이 올바르게 파싱되는지 확인할 수 있다.
 파싱 결과를 파싱 이벤트 혹은 파스 트리를 통해 확인해 볼 수 있다.
 
-[<img src="http://3.bp.blogspot.com/-1Pdv1XD_NjY/UMMIa7gSWLI/AAAAAAAAAJ0/2mzgbjXoauw/s400/gold_parser_2.png" width="400" height="286" />](http://3.bp.blogspot.com/-1Pdv1XD_NjY/UMMIa7gSWLI/AAAAAAAAAJ0/2mzgbjXoauw/s1600/gold_parser_2.png)
+![]({% asset_path gold_parser_2.png %})
 
 ## 문법 만들기
 
 골드 파서로 파싱할 언어의 문법을 작성해보자. 예를 위해 간단한 계산기 파서를 만들어 보자.
-이 언어는 정수를 대상으로 +, -, \*, / 를 처리할 수 있고 괄호를 인식한다.
+이 언어는 정수를 대상으로 `+`, `-`, `*`, `/` 를 처리할 수 있고 괄호를 인식한다.
 이 언어는 아래와 같은 입력을 처리할 수 있다.
 
 > -(10+20+35)\*4/20
@@ -57,18 +59,18 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 골드 파서는 보통의 파서 생성기와 같이 토큰 정의에 정규식을 문법 정의이 DNF 를 사용한다.
 먼저 계산기 토큰을 정의하자. 계산기를 이루는 가장 주요한 토큰은 숫자다.
 0 을 포함한 양의 정수를 정의하자.
-(음의 정수는 1항 연산자 - 로 처리한다.)
+(음의 정수는 1항 연산자 `-` 로 처리한다.)
 
-```
+```python
 {Digi9} = {Digit} - ['0']
 Num     = '0' | {Digi9}{Digit}*
 ```
 
 토큰을 정의했으면 토큰을 가지고 BNF 를 사용해 문법을 정의하자.
 골드 파서는 단순한 토큰은 문법 정의 때 따로 정의 없이 바로 사용할 수 있다.
-(+, - 등) 아래 문법은 우선순위를 고려한 애매함 없는 계산기 언어의 문법이다.
+(`+`, `-` 등) 아래 문법은 우선순위를 고려한 애매함 없는 계산기 언어의 문법이다.
 
-```
+```python
 <E>   ::= <E> '+' <M>
        |  <E> '-' <M>
        |  <M>
@@ -85,11 +87,11 @@ Num     = '0' | {Digi9}{Digit}*
 이 파일에는 언어 문법을 구성하는 토큰과 생성 규식이 들어있고 파싱에 중요한 역할을 하는 DFA 테이블과 LALR 테이블이 계산되어 포함된다.
 위 계산기 토큰의 DFA 는 아래와 같은 형태를 가진다.
 
-[![](http://4.bp.blogspot.com/-QIbjhuFktyU/UML3d4MDuHI/AAAAAAAAAJQ/xMWZw9mIMtM/s1600/temp_operator_dfa.png)](http://4.bp.blogspot.com/-QIbjhuFktyU/UML3d4MDuHI/AAAAAAAAAJQ/xMWZw9mIMtM/s1600/temp_operator_dfa.png)
+![]({% asset_path temp_operator_dfa.png %})
 
 계산기 문법의 LALR 테이블은 아래와 같다. (S:Shift, R:Reduce, G:Goto, A:Accept)
 
-[![](http://1.bp.blogspot.com/-dN_IDWbRIbk/UML3envGG8I/AAAAAAAAAJY/9um3xV3Iakk/s1600/temp_operator_lalr.png)](http://1.bp.blogspot.com/-dN_IDWbRIbk/UML3envGG8I/AAAAAAAAAJY/9um3xV3Iakk/s1600/temp_operator_lalr.png)
+![]({% asset_path temp_operator_lalr.png %})
 
 자 이제 문법 데이터를 만들었으니 파싱을 해보자.
 
@@ -111,7 +113,7 @@ pyauparser.parse_string(g, "-(10+20+35)*4/20", handler=callback)
 
 이를 실행하면 다음과 같이 LALR 파싱 결과가 출력되는 것을 볼 수 있다.
 
-```
+```python
 SHIFT   S=1, T=- '-'
 SHIFT   S=2, T=( '('
 SHIFT   S=3, T=Num '10'
@@ -129,7 +131,7 @@ LALR 는 상향식 파서이기 때문에 Reduce 이벤트가
 \#번호로 표시된 것이 Reduce 이벤트 발생 순서다.
 만약 이러한 post-order 트리 탐색이 충분하다면 이 이벤트를 잡아서 처리할 수 있다.
 
-[![](http://3.bp.blogspot.com/-zWsMO2EYTOs/UMMzkrV9EyI/AAAAAAAAAKI/R404nSXolCA/s1600/temp_1_sub.png)](http://3.bp.blogspot.com/-zWsMO2EYTOs/UMMzkrV9EyI/AAAAAAAAAKI/R404nSXolCA/s1600/temp_1_sub.png)
+![]({% asset_path temp_1_sub.png %})
 
 계산기는 이 순서로 충분히 계산해 낼 수 있으므로
 아래와 같이 실제 계산을 하는 핸들러를 넣어 계산기를 구현할 수 있다.
@@ -164,7 +166,7 @@ tree = pyauparser.parse_string_to_tree(g, "-(10+20+35)*4/20")
 이 계산식은 아래와 같은 파스 트리를 만들어 낸다.
 파스 트리를 보면 어떻게 계산을 하면 좋을지 상상 할 수 있다. :)
 
-[![](http://3.bp.blogspot.com/-GwS6YmQXiAU/UMM2LwYb86I/AAAAAAAAAKY/sLf6Y6-fZc8/s1600/temp_1_.png)](http://3.bp.blogspot.com/-GwS6YmQXiAU/UMM2LwYb86I/AAAAAAAAAKY/sLf6Y6-fZc8/s1600/temp_1_.png)
+![]({% asset_path temp_1_.png %})
 
 아래와 같이 구축된 트리를 순회하면서 결과를 계산할 수 있다.
 
@@ -198,9 +200,9 @@ print "Result = {0}".format(result)
 구축하는 것이 유리하다.
 PyAuParser 의 SimplifiedTree 기능으로 아래와 같이 AST 를 만들 수 있다.
 
-[![](http://3.bp.blogspot.com/-Od6LRULtNZU/UMM209LDYrI/AAAAAAAAAKg/WzW5qU7wuc8/s1600/temp_4_.png)](http://3.bp.blogspot.com/-Od6LRULtNZU/UMM209LDYrI/AAAAAAAAAKg/WzW5qU7wuc8/s1600/temp_4_.png)
+![]({% asset_path temp_4_.png %})
 
-파싱에는 필요하지만 실제 계산에는 필요하지 않은 토큰이 제거되었고 (+, -, ...)
+파싱에는 필요하지만 실제 계산에는 필요하지 않은 토큰이 제거되었고 (`+`, `-`, ...)
 불필요한 노드도 제거되었다.
 뿐만 아니라 10 + 20 + 35 을 구성하는 노드가 리스트 형태로 펼쳐진 것을 볼 수 있다.
 
