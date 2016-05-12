@@ -95,7 +95,7 @@ PC 재부팅이 오래 걸리니까 메모리를 무지막지하게 할당하는
 먼저 <a href="http://technet.microsoft.com/en-us/sysinternals/bb897561.aspx">Cacheset</a>
 은 캐시 크기를 제어하는 유틸리티다. </p>
 
-<p><img src="/assets/posts/CacheSet.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-13-flush-windows-file-cache/CacheSet.png" alt="" /></p>
 
 <p>여기서 Clear 버튼을 누르면 캐시가 날아간다. 하지만 다 날아가지 않는다.
 여기에 윈도우 캐시 시스템의 미묘함을 볼 수 있다.
@@ -104,7 +104,7 @@ PC 재부팅이 오래 걸리니까 메모리를 무지막지하게 할당하는
 Rammap 은 시스템 메모리의 사용 상태를 보는 유틸리티이다.
 거기에 유틸리티 기능으로 Empty 기능이 포함되어 있다.</p>
 
-<p><img src="/assets/posts/RamMapEmpty.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-13-flush-windows-file-cache/RamMapEmpty.png" alt="" /></p>
 
 <p>Empty - Empty Standby List 메뉴를 선택하면 캐시를 완전히 비울 수 있다.
 이 RamMap 은 Windows Vista 부터 사용할 수 있기 때문이 이 편리한 과정은
@@ -121,7 +121,7 @@ Windows Vista 부터 사용할 수 있다.</p>
  캐시됨 = Standby + Modified.
  따라서 첫번째 Cacheset Clear 때 캐시됨 메모리가 늘어나는 것은 자연스러운 현상이다.)</p>
 
-<p><img src="/assets/posts/CacheMemoryFlow.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-13-flush-windows-file-cache/CacheMemoryFlow.png" alt="" /></p>
 
 <p>자 이제 부터 Cold Start 를 위해서는 이 방법을 쓰면 좋다.
 더 이상 시스템 재시작이나 메모리 과할당을 사용할 필요가 없다.
@@ -132,7 +132,7 @@ Windows Vista 부터 사용할 수 있다.</p>
 <p>먼저 윈도우의 파일 I/O 요청이 어떻게 동작하는지 Windows Internals 에 있는 도표를 통해 살펴보자.
 (Windows Internals 5th Edition, Chapter 10 Cache Manager, Figure 10-10)</p>
 
-<p><img src="/assets/posts/Internals.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-13-flush-windows-file-cache/Internals.png" alt="" /></p>
 
 <p>간단히 정리하면 윈도우의 파일 I/O 요청은 다음과 같은 순서로 수행된다.
 - File I/O 요청이 들어오면 파일 시스템 드라이버가 캐시 매니저에게 데이터를 요청한다.
@@ -159,7 +159,7 @@ Standby 메모리를 바로 넘겨준다. 일종의 2차 캐시 역할을 하는
 
 <p>Rammap 을 사용하면 어떤 파일이 Standby 상태로 메모리에 올라와 있는지 볼 수 있다.</p>
 
-<p><img src="/assets/posts/Rammap2.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-13-flush-windows-file-cache/Rammap2.png" alt="" /></p>
 
 <p>이런 이유로 Cache 워킹셋을 비우고 Standby 메모리도 비워야 캐시가 완전히 빈 상태를 만들 수 있는 것이다.</p>
 
@@ -209,7 +209,7 @@ WorkingSet 크기를 조절한다. (최소, 최대 값 모두 -1 을 넣으면 C
  <a href="http://brandonlive.com/2010/02/21/measuring-memory-usage-in-windows-7/">Measuring memory usage in Windows 7</a>
  에 잘 정리되어 있다.)</p>
 
-<p><img src="/assets/posts/FunnyModified.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-13-flush-windows-file-cache/FunnyModified.png" alt="" /></p>
 
 <p>한글판와 영문판을 위/아래로 붙여봤는데 Modified 가 수정한 날짜,
 Standby 가 대기 모드로 번역된 한글판 윈도우가 참 인상적이다. :)</p>

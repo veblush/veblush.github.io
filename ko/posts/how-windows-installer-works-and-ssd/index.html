@@ -91,7 +91,7 @@ C 드라이브로 사용하는 80GB SSD 가 OS + 작업 공간으로 쓰기에 �
 이 43GB 를 돈으로 환산하면 HDD 는 2천원인데 반해 SSD 는 6만원이나 된다.
 (2TB HDD, 80GB SSD 모두 11만원 기준)</p>
 
-<p><img src="/assets/posts/S_Space_1.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/S_Space_1.png" alt="" /></p>
 
 <p>누가 이렇게 용량을 차지하나 봤더니 Windows 폴더가 28GB 로 1등이다.
 아니 왜 Windows 폴더가 28GB 나 하지? 설치는 DVD 1장으로도 되는데?
@@ -99,7 +99,7 @@ C 드라이브로 사용하는 80GB SSD 가 OS + 작업 공간으로 쓰기에 �
 winsxs 폴더가 7.3GB 로 대부분의 용량을 차지하고 있었다.
 그래서 Installer 폴더를 더 열어보면,</p>
 
-<p><img src="/assets/posts/S_Space_1b.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/S_Space_1b.png" alt="" /></p>
 
 <p>Installer 폴더 바로 아래에 있는 msi, msp 확장자의 파일들이 4.6GB 를 차지하고 있고
 $PatchCache$ 폴더 아래에 있는 여러 폴더안에 있는 파일들이 5.2GB 를 차지하고 있었다.
@@ -107,12 +107,12 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 탐색기의 컬럼에 “제목” 필드를 추가하면 어떤 내용인지 알수 있는 정보를 볼 수 있다.
 (모든 파일이 다 나오는 것은 아니다.)</p>
 
-<p><img src="/assets/posts/Installer_Files.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/Installer_Files.png" alt="" /></p>
 
 <p>Installer/$PatchCache$ 폴더 아래엔 Managed 폴더가 있고 그 아래 여러 폴더가 있다.
 그 중 하나의 폴더를 예로 살펴보면 다음과 같은 파일들을 볼 수 있다</p>
 
-<p><img src="/assets/posts/Patch_Files.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/Patch_Files.png" alt="" /></p>
 
 <p>도대체 Installer 폴더는 어떤 용도의 폴더이길래 이런 파일들이 용량을 차지하고 있나 궁금해서 자료를 살펴보았다.</p>
 
@@ -179,13 +179,13 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 <p>이제 실행한 결과를 살펴보면 먼저 Installer 에 있는 msi, msp 파일들이 어떤 프로그램인지 알 수 있다.
 상위 6개를 보면 오피스, Visual Studio 의 패치 파일인 것을 알 수 있다.</p>
 
-<p><img src="/assets/posts/WinstView_Report_3.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/WinstView_Report_3.png" alt="" /></p>
 
 <p>실행한 결과 두 번째를 보면 Installer/$PatchCache$ 폴더의 하위에 있는 여러 폴더가
 어떤 프로그램을 위한 폴더인지 알 수 있다.
 상위 6개를 보면 역시 오피스, Visual Studio 를 위한 폴더임을 알 수 있다.</p>
 
-<p><img src="/assets/posts/WinstView_Report_4.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/WinstView_Report_4.png" alt="" /></p>
 
 <p>특히 $PatchCache$ 는 원래 프로그램의 최대 2배까지 커질 수 있어 용량이 어마어마하다.
 (2배인 이유는 RTM 파일, 서비스팩이 적용된 파일을 보관할 수 있기 때문이다)</p>
@@ -206,7 +206,7 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 
 <p>이제 아래 그림처럼 Installer 폴더가 9.8GB 에서 5.2GB 줄어 4.6GB 가 된 것을 볼 수 있다.</p>
 
-<p><img src="/assets/posts/S_Space_2.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/S_Space_2.png" alt="" /></p>
 
 <p>하지만 아쉽게도 Installer 폴더 아래에 있는 파일은 지울 수 없다.
 Windows Update 등에서 원격으로 받아올 수 있는건 필요할 때 마다 받아오거나
@@ -234,7 +234,7 @@ DLL Hell 을 해결하기 위한 시스템인 Windows Side by Side 가 사용�
 <p>여기서 하드링크가 연결되어 있지 않은 2.8GB 중에서 용량 순으로 파일 순위를 보면 다음과 같다.
 (Size 는 해당 파일의 버전별 크기 총합. Count 는 버전 개수.)</p>
 
-<p><img src="/assets/posts/WinsxsTop.png" alt="" /></p>
+<p><img src="/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/WinsxsTop.png" alt="" /></p>
 
 <p>인터넷 익스플로러, 윈도우 시스템, .NET 컴포넌트, MFC 파일등이 업데이트 될 때마다
 WinSxS 에 등록해 파일이 8~12 개씩 쌓여 용량을 많이 차지하고 있는 것을 볼 수 있다.

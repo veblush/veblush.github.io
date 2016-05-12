@@ -6,8 +6,8 @@
     <description>blog for veblush, programmer</description>
     <link>http://veblush.github.io/ko/</link>
     <atom:link href="http://veblush.github.io/ko/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 12 May 2016 17:39:47 +0900</pubDate>
-    <lastBuildDate>Thu, 12 May 2016 17:39:47 +0900</lastBuildDate>
+    <pubDate>Thu, 12 May 2016 18:06:18 +0900</pubDate>
+    <lastBuildDate>Thu, 12 May 2016 18:06:18 +0900</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
     
       <item>
@@ -180,13 +180,13 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 테스트 작성 및 (그래도 친절한) 문법 오류 안내를 지원한다.
 보통의 파서 생성기는 이러한 도구가 없거나 부실해 그 환경에 익숙해지지 않으면 사용하기 어렵다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/gold_parser_1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/gold_parser_1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;문법을 작성하면서 작성된 문법을 테스트 할 수 있다.
 테스트 하고자 하는 문자열을 입력하고 이 문자열이 올바르게 파싱되는지 확인할 수 있다.
 파싱 결과를 파싱 이벤트 혹은 파스 트리를 통해 확인해 볼 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/gold_parser_2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/gold_parser_2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;section&quot;&gt;문법 만들기&lt;/h2&gt;
 
@@ -229,11 +229,11 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 이 파일에는 언어 문법을 구성하는 토큰과 생성 규식이 들어있고 파싱에 중요한 역할을 하는 DFA 테이블과 LALR 테이블이 계산되어 포함된다.
 위 계산기 토큰의 DFA 는 아래와 같은 형태를 가진다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/temp_operator_dfa.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/temp_operator_dfa.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;계산기 문법의 LALR 테이블은 아래와 같다. (S:Shift, R:Reduce, G:Goto, A:Accept)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/temp_operator_lalr.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/temp_operator_lalr.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;자 이제 문법 데이터를 만들었으니 파싱을 해보자.&lt;/p&gt;
 
@@ -273,7 +273,7 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 #번호로 표시된 것이 Reduce 이벤트 발생 순서다.
 만약 이러한 post-order 트리 탐색이 충분하다면 이 이벤트를 잡아서 처리할 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/temp_1_sub.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/temp_1_sub.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;계산기는 이 순서로 충분히 계산해 낼 수 있으므로
 아래와 같이 실제 계산을 하는 핸들러를 넣어 계산기를 구현할 수 있다.&lt;/p&gt;
@@ -308,7 +308,7 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 &lt;p&gt;이 계산식은 아래와 같은 파스 트리를 만들어 낸다.
 파스 트리를 보면 어떻게 계산을 하면 좋을지 상상 할 수 있다. :)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/temp_1_.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/temp_1_.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;아래와 같이 구축된 트리를 순회하면서 결과를 계산할 수 있다.&lt;/p&gt;
 
@@ -342,7 +342,7 @@ pyparsing 은 python 에서만 boost::spirit 은 C++ 에서만 사용할 수 있
 구축하는 것이 유리하다.
 PyAuParser 의 SimplifiedTree 기능으로 아래와 같이 AST 를 만들 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/temp_4_.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-12-09-parsing-with-gold-parser/temp_4_.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;파싱에는 필요하지만 실제 계산에는 필요하지 않은 토큰이 제거되었고 (&lt;code class=&quot;highlighter-rouge&quot;&gt;+&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;-&lt;/code&gt;, …)
 불필요한 노드도 제거되었다.
@@ -1168,7 +1168,7 @@ C 드라이브로 사용하는 80GB SSD 가 OS + 작업 공간으로 쓰기에 �
 이 43GB 를 돈으로 환산하면 HDD 는 2천원인데 반해 SSD 는 6만원이나 된다.
 (2TB HDD, 80GB SSD 모두 11만원 기준)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/S_Space_1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/S_Space_1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;누가 이렇게 용량을 차지하나 봤더니 Windows 폴더가 28GB 로 1등이다.
 아니 왜 Windows 폴더가 28GB 나 하지? 설치는 DVD 1장으로도 되는데?
@@ -1176,7 +1176,7 @@ C 드라이브로 사용하는 80GB SSD 가 OS + 작업 공간으로 쓰기에 �
 winsxs 폴더가 7.3GB 로 대부분의 용량을 차지하고 있었다.
 그래서 Installer 폴더를 더 열어보면,&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/S_Space_1b.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/S_Space_1b.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Installer 폴더 바로 아래에 있는 msi, msp 확장자의 파일들이 4.6GB 를 차지하고 있고
 $PatchCache$ 폴더 아래에 있는 여러 폴더안에 있는 파일들이 5.2GB 를 차지하고 있었다.
@@ -1184,12 +1184,12 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 탐색기의 컬럼에 “제목” 필드를 추가하면 어떤 내용인지 알수 있는 정보를 볼 수 있다.
 (모든 파일이 다 나오는 것은 아니다.)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Installer_Files.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/Installer_Files.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Installer/$PatchCache$ 폴더 아래엔 Managed 폴더가 있고 그 아래 여러 폴더가 있다.
 그 중 하나의 폴더를 예로 살펴보면 다음과 같은 파일들을 볼 수 있다&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Patch_Files.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/Patch_Files.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;도대체 Installer 폴더는 어떤 용도의 폴더이길래 이런 파일들이 용량을 차지하고 있나 궁금해서 자료를 살펴보았다.&lt;/p&gt;
 
@@ -1256,13 +1256,13 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 &lt;p&gt;이제 실행한 결과를 살펴보면 먼저 Installer 에 있는 msi, msp 파일들이 어떤 프로그램인지 알 수 있다.
 상위 6개를 보면 오피스, Visual Studio 의 패치 파일인 것을 알 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/WinstView_Report_3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/WinstView_Report_3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;실행한 결과 두 번째를 보면 Installer/$PatchCache$ 폴더의 하위에 있는 여러 폴더가
 어떤 프로그램을 위한 폴더인지 알 수 있다.
 상위 6개를 보면 역시 오피스, Visual Studio 를 위한 폴더임을 알 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/WinstView_Report_4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/WinstView_Report_4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;특히 $PatchCache$ 는 원래 프로그램의 최대 2배까지 커질 수 있어 용량이 어마어마하다.
 (2배인 이유는 RTM 파일, 서비스팩이 적용된 파일을 보관할 수 있기 때문이다)&lt;/p&gt;
@@ -1283,7 +1283,7 @@ Installer 폴더에는 아래 그림처럼 여러 msi, msp 파일이 있다.
 
 &lt;p&gt;이제 아래 그림처럼 Installer 폴더가 9.8GB 에서 5.2GB 줄어 4.6GB 가 된 것을 볼 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/S_Space_2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/S_Space_2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;하지만 아쉽게도 Installer 폴더 아래에 있는 파일은 지울 수 없다.
 Windows Update 등에서 원격으로 받아올 수 있는건 필요할 때 마다 받아오거나
@@ -1311,7 +1311,7 @@ DLL Hell 을 해결하기 위한 시스템인 Windows Side by Side 가 사용�
 &lt;p&gt;여기서 하드링크가 연결되어 있지 않은 2.8GB 중에서 용량 순으로 파일 순위를 보면 다음과 같다.
 (Size 는 해당 파일의 버전별 크기 총합. Count 는 버전 개수.)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/WinsxsTop.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-11-03-how-windows-installer-works-and-ssd/WinsxsTop.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;인터넷 익스플로러, 윈도우 시스템, .NET 컴포넌트, MFC 파일등이 업데이트 될 때마다
 WinSxS 에 등록해 파일이 8~12 개씩 쌓여 용량을 많이 차지하고 있는 것을 볼 수 있다.
@@ -1349,7 +1349,7 @@ WinSxS 에 등록해 파일이 8~12 개씩 쌓여 용량을 많이 차지하고 
 &lt;p&gt;저장소 마이그레이션은 예전 저장소에서 새 저장소로 데이터를 옮기는 과정이다.
 이 과정은 아래의 그림과 같이 예전 저장소에 있는 파일과 로그를 익스포트하는 과정과 여기서 얻은 데이터를 새 저장소로 임포트하는 과정으로 이루어진다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Repo.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Repo.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;특히 마이그래이션 작업은 두 저장소가 다른 버전 관리 시스템에 있을 때 까다로워진다.
 만약 두 시스템의 리비전 모델이 많이 다른 경우라면 더욱 그렇다.
@@ -1367,7 +1367,7 @@ subversion 으로 올 때는 적당한 시점에 mkdir 작업을 임의로 넣�
 
 &lt;p&gt;설명을 위해 아래와 같은 예제 저장소 데이터를 가정하자. &lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-A.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-A.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;가로축이 리비전 증가다. 리비전 1 부터 4 까지 총 4개의 리비전 변화가 있었다.
 저장소의 파일은 노드로 표시되고 “파일이름 &amp;lt;내용&amp;gt;” 형식으로 표현되어 있다.
@@ -1411,7 +1411,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 과거 이력은 모두 무시하고 현재 파일만 이동하는 전략이다.
 새 저장소에 옮겨진 리비전의 모습은 아래 그림과 같으며 과거 리비전에 대한 정보가 모두 사라졌음을 볼 수 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-B.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-B.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;이 방법은 간단하다. 단순히 예전 저장소의 최신파일을 받아 새 저장소에 추가하는 것으로 충분하다.
 때문에 마이그레이션 비용이 가장 적고 그래서 많이 사용되는 방법이기도 하다.
@@ -1428,7 +1428,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 리비전 2, 4 시점의 파일은 정확히 남고 그 사이의 이력은 뭉게지는 것을 볼 수 있다.
 (banana 의 파일 내용이 yellow 에서 바로 black 이 되는 것이 한 예이다.)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-C.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-C.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;방법도 간단하다. 먼저 중요 포인트의 리비전에 해당하는 파일을 모두 받는다.
 이것을 리비전 별로 묶고 아래와 같은 절차를 밟는다.
@@ -1454,7 +1454,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 이 파일에 대한 이력만 추려서 새 저장소를 구성하면 아래와 같은 그림을 얻을 수 있다.
 이 방법은 현재 남아있는 파일의 이력이 남기 때문에 blame 등의 기능을 종전과 같이 그대로 사용할 수 있는 장점이 있다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-D.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-D.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;구현은 예전 저장소에 있는 모든 파일들의 과거 이력을 얻는 것으로 시작한다.
 개별 이력을 얻는 것이 보통의 버전 관리 시스템은 빠르지 않기 때문에 파일이
@@ -1484,7 +1484,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 없다면 손이 많이 가는 작업이 될 가능성이 높다.
 만약 1:1 로 완벽하게 마이그레이션이 가능하다면 아래 그림처럼 예제와 동일한 로그가 새 저장소에 구축된다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-A.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-A.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;방법은 기본적으로 간단하다. 예전 저장소의 변경 내용을 순서대로 새 저장소에 적용하면 된다.
 예전 저장소 모든 리비전 r 에 대해 순서대로
@@ -1509,7 +1509,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 &lt;p&gt;기본적으로 최신 스냅샷을 사용하되 중요 파일에 대해서만 현재 파일의 변경 로그 유지 방법을 사용한다.
 아래 그림은 orange 에 대해서는 최신 스냅샷을 banana 에 대해서는 변경 로그 유지를 적용한 예이다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-F.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-F.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;방법은 현재 파일 변경 로그 유지와 유사하다.
 중요 파일은 기존과 같게 동작하도록 하고 그렇지 않은 파일에 대해서 로그를 옮기지 않으면 된다.
@@ -1523,7 +1523,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 변경 로그 유지 기능을 사용해 최근 변경 로그를 유지 하는 방법이다.
 아래는 리비전 2, 4 를 주요 스냅샷으로 남기고 리비전 2 → 4 사이의 변경 로그를 유지한 예이다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Revision-E.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-E.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;방법은 마지막 리비전 직전까지는 주요 스냅샷과 동일하고 마지막 리비전 단계에서
 현재 파일의 변경 로그 유지 방법과 동일하다. 이 방법은 주요 스냅샷을 재구성할 수 있고
@@ -1665,7 +1665,7 @@ p4 change -o REV | change &lt;span class=&quot;s2&quot;&gt;&quot;Date:&quot;&lt;
 버전 관리 시스템은 이제 개발에 필수 요수가 되었다.
 이 시스템을 사용하기 전엔 도대체 어떻게 개발을 했나 싶을 정도다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/HgSvnGit.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-26-vcs-management-guideline/HgSvnGit.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;이제는 사용 요령이나 유용한 팁들이 많아 시스템 사용에 큰 어려움이 없이 잘 쓰지만
 정리 차원에서 저장소 관리 가이드라인을 적어본다.
@@ -1784,7 +1784,7 @@ map 은 Red-Black Tree 를 사용해 키의 순서를 유지하는 반면 unored
 unordered_map 은 키의 순서를 유지할 필요가 없기 때문에 탐색 속도등에 유리한 점을 가질 수 있다.
 (아래 그림 좌: Red-Black Tree, 우: Separate Chaining Hash Table)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/RbHash.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/RbHash.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;데이터가 N 개일 때 map 은 O(lgN) 의 탐색 속도를 보이고 unordered_map 은 O(1) 의 탐색 속도를 보인다.
 때문에 데이터가 많을 수록 unordered_map 이 속도에 유리한데 문제는 “언제부터 유리한가?” 이다.
@@ -1837,7 +1837,7 @@ VC++ 의 unordered_map 은 해시값으로 부터 버킷을 찾아낼 때 해시
 &lt;p&gt;그 결과는 다음과 같다. (실행 환경: Intel i7-3550 3.3GHz, Windows 7 SP1, VC++ 10 SP1)
 X 축은 데이터 크기 N, Y 축은 탐색 1회에 걸린 시간 µs 이다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Graph01.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Graph01.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;먼저 map은 O(lgN) 의 형태를 보이는 것을 알 수 있다.
 다만 128~512 구간에서 급격히 느려지는데 이는 캐시 미스의 영향으로 보인다.
@@ -1919,10 +1919,10 @@ N 이 6 일 때 부터 unordered_map 이 map 보다 탐색에 유리한 것을 �
 Y 축은 탐색 1회에 걸린 시간 µs 이다.&lt;/p&gt;
 
 &lt;center&gt;
-  &lt;img src=&quot;/assets/posts/Graph02-1.png &quot; style=&quot;display: inline&quot; /&gt;
-  &lt;img src=&quot;/assets/posts/Graph02-2.png &quot; style=&quot;display: inline&quot; /&gt;
-  &lt;img src=&quot;/assets/posts/Graph02-3.png &quot; style=&quot;display: inline&quot; /&gt;
-  &lt;img src=&quot;/assets/posts/Graph02-4.png &quot; style=&quot;display: inline&quot; /&gt;
+  &lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Graph02-1.png &quot; style=&quot;display: inline&quot; /&gt;
+  &lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Graph02-2.png &quot; style=&quot;display: inline&quot; /&gt;
+  &lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Graph02-3.png &quot; style=&quot;display: inline&quot; /&gt;
+  &lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Graph02-4.png &quot; style=&quot;display: inline&quot; /&gt;
 &lt;/center&gt;
 
 &lt;p&gt;기본적으로 정수가 키인 경우와 비슷한 결과를 보인다.
@@ -1930,7 +1930,7 @@ Y 축은 탐색 1회에 걸린 시간 µs 이다.&lt;/p&gt;
 교차하는 점이 M 이 커짐에 따라 같이 커지는 현상이다. 이를 좀 더 잘 보기위해
 M 에 따라 map 탐색시간 / unordered_map 탐색시간 비율 그래프를 아래와 같이 그려봤다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Graph02.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Graph02.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;M=4 일때 ratio 가 1이 되는 지점은 N=128~256 지점이고
 M=16 일때 ratio 가 1이 되는 지점은 N=512~1024 지점이다.
@@ -1976,7 +1976,7 @@ M 이 커질 수록 map 이 유리한 N 의 범위가 커지는 것을 볼 수 �
 &lt;p&gt;map 의 노드 마다 문자열을 비교하는 부분의 시간 복잡도를 구해보자.
 map 을 구성하는 트리가 완전하게 균형된 트리를 구축했다고 했을 때 M=4 의 트리는 다음과 같은 형태를 가진다.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/Tree.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-21-map-vs-unorderedmap-for-string-key/Tree.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;먼저 키로 받은 데이터 분포 특성에 의해 d=0 노드는 첫 글자 만으로 분기가 가능하다.
 이 부분이 중요한데 노드 분기를 위해 문자 M 을 모두 비교할 필요가 없기 때문이다.
@@ -2089,7 +2089,7 @@ cmake, scons 가 대표적인 멀티 플랫폼 빌드 시스템이다.
 &lt;p&gt;이렇게 하면 프로젝트 파일을 하나만 유지할 수 있어서 원래 해결하려 했던 문제가 자연스럽게 해결된다.
 또한 새 시스템을 도입하는 것이 아니니 큰 학습 비용 없이 적응해 사용할 수 있다. 자 그럼 어떻게 할까?&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/posts/GNU-VS.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-16-make-from-visualcpp-project/GNU-VS.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;make-the-legacy&quot;&gt;Make, the Legacy&lt;/h2&gt;
 

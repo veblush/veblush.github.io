@@ -97,17 +97,17 @@ Radix Tree 를 이용해 문자열 탐색을 하는 코드를 작성해 보았�
 로 표현해보면 다음과 같다.
 (Prefix Tree 는 테이블의 문자열을 받아들이는 DFA 와 비슷하게 생겼다.)</p>
 
-<p><img src="/assets/posts/CTest1.gv.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-09-static-string-table-lookup-using-radix/CTest1.gv.png" alt="" /></p>
 
 <p>구성한 Prefix Tree 에서 자식이 1개인 노드들을 합쳐서 하나의 노드로 줄이면 다음과 같은
 <a href="http://en.wikipedia.org/wiki/Radix_tree">Radix Tree</a> 를 만들 수 있다.</p>
 
-<p><img src="/assets/posts/CTest1_2.gv.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-09-static-string-table-lookup-using-radix/CTest1_2.gv.png" alt="" /></p>
 
 <p>Radix Tree 로 바로 코드를 만들 수 있는데 하기 전에 Radix Tree 를 살짝 변형해보자.
 “노드 분기는 문자로만 한다.” 라는 제약을 만족시키는 Radix Tree 는 다음과 같다.</p>
 
-<p><img src="/assets/posts/CTest2.gv.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-09-static-string-table-lookup-using-radix/CTest2.gv.png" alt="" /></p>
 
 <p>문자로만 분기를 허용하는 이유는 switch 문을 사용하기 위해서다.
 이제 얻어진 수정된 Radix Tree 를 가지고 parse 문을 만들어 보자.</p>
@@ -163,7 +163,7 @@ memcmp 가 str[n]cmp 보다 컴파일러에 의한 최적화될 여지가 많기
 또한 길이 확인이 되었으므로 마지막 단계에 있었던 null 문자 확인 단계가 제거된다.
 길이 분기가 추가된 Tree 는 다음과 같다.</p>
 
-<p><img src="/assets/posts/CTest3.gv.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-09-static-string-table-lookup-using-radix/CTest3.gv.png" alt="" /></p>
 
 <p>이 Tree 로 부터 코드 생성 룰은 앞서 만든 것과 유사하다. str[n]cmp 대신
 memcmp 를 사용하고 첫 분기에 문자열 길이를 확인 하는 정도다. 이 룰에
@@ -236,7 +236,7 @@ delimiter 에 의해 길이를 알 수 있고 애초에 std::basic_string 과 �
 
 <p>측정 결과는 다음과 같다. 걸린 시간의 단위는 µs.</p>
 
-<p><img src="/assets/posts/Benchmark.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-09-static-string-table-lookup-using-radix/Benchmark.png" alt="" /></p>
 
 <p>결과 해석</p>
 
@@ -264,7 +264,7 @@ Debug 빌드에서는 sorted_vector 가 좀 더 나은 성능을 보인다.</li>
 
 <p>측정 결과는 다음과 같다. 걸린 시간의 단위는 µs.</p>
 
-<p><img src="/assets/posts/Benchmark2.png" alt="" /></p>
+<p><img src="/assets/posts/2012-10-09-static-string-table-lookup-using-radix/Benchmark2.png" alt="" /></p>
 
 <p>결과 해석</p>
 
