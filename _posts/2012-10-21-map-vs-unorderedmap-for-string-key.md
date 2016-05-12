@@ -18,7 +18,9 @@ unordered_map 은 키의 순서를 유지할 필요가 없기 때문에 탐색 �
 데이터가 N 개일 때 map 은 O(lgN) 의 탐색 속도를 보이고 unordered_map 은 O(1) 의 탐색 속도를 보인다.
 때문에 데이터가 많을 수록 unordered_map 이 속도에 유리한데 문제는 "언제부터 유리한가?" 이다.
 특히 키가 문자열일 때는 어떤 차이가 발생하는지가 궁금해 몇 가지 테스트를 해보았다.
-(문자열에 대한 궁금증은 지난번 [Static String Table Lookup using Radix Tree](http://veblush-p.blogspot.kr/2012/10/static-string-table-lookup-using-radix.html) 의 벤치마크 결과 때문이다)
+(문자열에 대한 궁금증은 지난번
+ [Static String Table Lookup using Radix Tree](./static-string-table-lookup-using-radix/)의
+ 벤치마크 결과 때문이다)
 
 ## Map, Unordered_map&lt;int, ...&gt;
 
@@ -139,8 +141,12 @@ Test<T>
 결과는 아래와 같다. M 이 4, 8, 12, 16 의 경우를 테스트했고 X 축은 데이터 크기 N 이고
 Y 축은 탐색 1회에 걸린 시간 µs 이다.
 
-![]({% asset_path Graph02-1.png %}) ![]({% asset_path Graph02-2.png %})
-![]({% asset_path Graph02-3.png %}) ![]({% asset_path Graph02-4.png %})
+<center>
+  <img src="{% asset_path Graph02-1.png %}" style="display: inline">
+  <img src="{% asset_path Graph02-2.png %}" style="display: inline">
+  <img src="{% asset_path Graph02-3.png %}" style="display: inline">
+  <img src="{% asset_path Graph02-4.png %}" style="display: inline">
+</center>
 
 기본적으로 정수가 키인 경우와 비슷한 결과를 보인다.
 하지만 M 의 크기 변화에 따라 재미있는 현상이 발생하는데 map 과 unordered_map 의 성능이
@@ -157,26 +163,26 @@ M 이 커질 수록 map 이 유리한 N 의 범위가 커지는 것을 볼 수 �
 ## 시간 복잡도
 
 map 와 unordered_map 의 "문자열 단위" 탐색 작업의 시간 복잡도는 다음과 같다.
-map: 
-- 노드 마다 문자열 비교: O(lgN)
-- 마지막 노드의 문자열 비교: O(1)
 
-unordered_map:
-- 입력 문자열의 hash function 수행: O(1)
-- 입력 문자열과 버킷에 있는 문자열 비교: O(1)
+- map: 
+  - 노드 마다 문자열 비교: O(lgN)
+  - 마지막 노드의 문자열 비교: O(1)
+- unordered_map:
+  - 입력 문자열의 hash function 수행: O(1)
+  - 입력 문자열과 버킷에 있는 문자열 비교: O(1)
 
 이번에는 문자열 길이를 적용해 "문자 단위" 탐색 작업의 시간 복잡도를 계산해보자.
 
-map: 
-- 노드 마다 문자열 비교: ?
-- 마지막 노드의 문자열 비교: O(M)
-
-unordered_map: 
-- 입력 문자열의 hash function 수행: O(M)
-- 입력 문자열과 버킷에 있는 문자열 비교: O(M)
+- map: 
+  - 노드 마다 문자열 비교: ?
+  - 마지막 노드의 문자열 비교: O(M)
+- unordered_map: 
+  - 입력 문자열의 hash function 수행: O(M)
+  - 입력 문자열과 버킷에 있는 문자열 비교: O(M)
 
 map 의 노드 마다 문자열을 비교하는 부분의 시간 복잡도를 구해보자.
 map 을 구성하는 트리가 완전하게 균형된 트리를 구축했다고 했을 때 M=4 의 트리는 다음과 같은 형태를 가진다.
+
 ![]({% asset_path Tree.gv.png %})
 
 먼저 키로 받은 데이터 분포 특성에 의해 d=0 노드는 첫 글자 만으로 분기가 가능하다.
@@ -184,10 +190,15 @@ map 을 구성하는 트리가 완전하게 균형된 트리를 구축했다고 
 d=4 노드부터 두번째 문자까지 비교를 해야 한다.
 이를 일반화 하면 노드 깊이 d 일 때 분기를 위해 필요한 문자 비교 횟수는 다음과 같다.
 
-[![](http://latex.codecogs.com/gif.latex?\small%20\bg_white%20\lceil%20\frac%7Bd+1%7D%7B\log_%7B2%7D%7CA%7C%7D%20\rceil "\small \bg_white \lceil \frac{d+1}{\log_{2}|A|} \rceil")](http://www.codecogs.com/eqnedit.php?latex=\small%20\bg_white%20\lceil%20\frac%7Bd@plus;1%7D%7B\log_%7B2%7D%7CA%7C%7D%20\rceil)
+$$
+\lceil \frac{d+1}{\log_{2}|A|} \rceil
+$$
 
 첫 노드부터 마지막 노드까지의 비교 횟수의 합은 다음과 같다.
-[![](http://latex.codecogs.com/gif.latex?\small%20\bg_white%20\sum_%7Bd=0%7D%5E%7B\log_%7B2%7Dn%7D\lceil%20\frac%7Bd+1%7D%7B\log_%7B2%7D%7CA%7C%7D%20\rceil%20\approx%20\frac%7B(\log_%7B2%7Dn)%5E%7B2%7D%7D%7B2\log_%7B2%7D%7CA%7C%7D "\small \bg_white \sum_{d=0}^{\log_{2}n}\lceil \frac{d+1}{\log_{2}|A|} \rceil \approx \frac{(\log_{2}n)^{2}}{2\log_{2}|A|}")](http://www.codecogs.com/eqnedit.php?latex=\small%20\bg_white%20\sum_%7Bd=0%7D%5E%7B\log_%7B2%7Dn%7D\lceil%20\frac%7Bd@plus;1%7D%7B\log_%7B2%7D%7CA%7C%7D%20\rceil%20\approx%20\frac%7B(\log_%7B2%7Dn)%5E%7B2%7D%7D%7B2\log_%7B2%7D%7CA%7C%7D)
+
+$$
+\sum_{d=0}^{\log_{2}n}\lceil \frac{d+1}{\log_{2}|A|} \rceil \approx \frac{(\log_{2}n)^{2}}{2\log_{2}|A|}
+$$
 
 따라서 비교에 필요한 횟수는 길이 M 과 관계 없이 N 에 종속적인 것을 알 수 있다.
 (이것은 키 문자열 집합의 분포 특성 때문에 그렇다)

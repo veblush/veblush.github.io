@@ -7,15 +7,15 @@
     <meta name="author" content="Esun Kim">
     <meta name="description" content="veblush, programmer.">
 
-    {% I18n_Headers https://veblush.github.io %}
-    {% capture langbaseurl %}{{site.baseurl}}{% if site.active_lang != site.default_lang %}/{{site.active_lang}}{% endif %}{% endcapture %}
-    
     <title>{{ page.title }}</title>
 
     <link rel="stylesheet" href="/css/main.css">
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }}" href="{{ site.url }}/feed.xml">
+    {% I18n_Headers https://veblush.github.io %}
+
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
-    
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
     <style>
         html { overflow-y :scroll }
     </style>
