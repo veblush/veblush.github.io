@@ -65,6 +65,8 @@ module Jekyll
           context.registers[:site].posts.docs.each do |post|
             if post.id == page["id"]
               path = "posts/#{post.data['date'].strftime("%Y-%m-%d")}-#{post.data['slug']}"
+              # remove language postfix (e.g. slug.en => slug)
+              path.sub!(/\.\w\w$/, "")
             end
           end
         end
