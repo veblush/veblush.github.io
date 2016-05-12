@@ -3,6 +3,11 @@ $main-font-stack: 'Open Sans', Arial, sans-serif;
 $source-font-stack: 'Ubuntu Mono', Arial, sans-serif;
 
 * { margin: 0; padding: 0; }
+
+html { 
+  overflow-y :scroll;
+  -webkit-text-size-adjust: 100%; 
+}
 html, body { height: 100%; }
 
 body {
