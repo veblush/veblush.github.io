@@ -11,7 +11,7 @@ lang: ko
 일이 가끔씩 있다. 예를 들면 다음과 같은 함수를 들 수 있다.
 
 ```cpp
- int parse(const char* s) {
+int parse(const char* s) {
   return
     s == "apple" -> 1    s == "apps" -> 2
     s == "bana" -> 3

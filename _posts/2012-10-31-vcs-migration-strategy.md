@@ -23,7 +23,7 @@ lang: ko
 mercurial 의 경우에는 그렇지 않다.
 때문에 subversion 의 mkdir 작업은 mercurial 에서는 빠져야 하고 반대로 mercurial 에서
 subversion 으로 올 때는 적당한 시점에 mkdir 작업을 임의로 넣어줘야 한다.
-(다행히 subversion -&gt; mercurial 은 [hgsubversion](https://bitbucket.org/durin42/hgsubversion/wiki/Home)
+(다행히 subversion → mercurial 은 [hgsubversion](https://bitbucket.org/durin42/hgsubversion/wiki/Home)
  툴이 있어 간편하게 마이그레이션 할 수 있다)
 최대한 예전 저장소의 구조와 데이터를 유지하면서 마이그레이션을 할 수 있다면 좋겠지만
 그 만큼 개발 비용이 소모되니 절충안을 잘 선택해야 한다.
@@ -41,7 +41,7 @@ subversion 으로 올 때는 적당한 시점에 mkdir 작업을 임의로 넣�
 또 가장 최근 리비전 4 에는 banana 와 orange 파일이 있는 것을 알 수 있다.
 리비전이 증가함에 따라 파일이 변하는데 파일의 변화는 노드 사이를 잇는 선으로 표시한다.
 변화를 발생시키는 파일 변경 내용은 A(dd, 추가), M(odify, 변경), C(opy, 복사), D(elete, 삭제) 이렇게 네 가지가 있다.
-위 그림에서 리비전 2-&gt; 3 과정을 보면 apple 파일은 삭제되고,
+위 그림에서 리비전 2 → 3 과정을 보면 apple 파일은 삭제되고,
 banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터 복사되었음을 알 수 있다.
 
 각 마이그레이션 전략이 제공하는 이점이 있다.
@@ -61,7 +61,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 - 현재 파일의 변경 내역 유지
   현재 스냅샷에 포함되어 있는 파일들의 변경 이력이 제대로 나오는지 여부다.
   현재 파일의 과거 버전을 받을 수도 있고 수정 내역을 통해 blame 을 할 수도 있다.
-  (예제 데이터의 banana 이력을 요청하면 yellow -&gt; brown -&gt; black 으로 변해 왔는지를 알 수 있어야 한다.)
+  (예제 데이터의 banana 이력을 요청하면 yellow → brown → black 으로 변해 왔는지를 알 수 있어야 한다.)
 
 그럼 어떤 전략이 있는지 살펴보자.
 
@@ -181,7 +181,7 @@ banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터
 
 기본적으로 주요 스냅샷을 사용하고 마지막 스냅샷과 직전 스냅샷 사이는
 변경 로그 유지 기능을 사용해 최근 변경 로그를 유지 하는 방법이다.
-아래는 리비전 2, 4 를 주요 스냅샷으로 남기고 리비전 2 -&gt; 4 사이의 변경 로그를 유지한 예이다.
+아래는 리비전 2, 4 를 주요 스냅샷으로 남기고 리비전 2 → 4 사이의 변경 로그를 유지한 예이다.
 
 ![]({% asset_path Revision-E.gv.png %})
 
@@ -302,7 +302,7 @@ Perforce 는 checkout 방식이므로 편집 전에 수정 요청을 해야한�
 (잘못 설정하면 파일이 깨지거나 submit 단계에 에러가 나거나 p4merge 에서 이상하게 나올 수 있다.
  마이그레이션 작업전에 [p4_filetypes](http://www.perforce.com/perforce/doc.current/manuals/p4guide/ab_filetypes.html)
  내용을 잘 살펴봐야 한다.)
-또한 파일이름에 @ \# \* % 문자가 포함되어 있는 경우 이스케입을 해줘야 한다.
+또한 파일이름에 `@` `#` `*` `%` 문자가 포함되어 있는 경우 이스케입을 해줘야 한다.
 
 ## 결론
 

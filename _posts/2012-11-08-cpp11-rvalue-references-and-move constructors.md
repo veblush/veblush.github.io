@@ -188,7 +188,7 @@ String function(...) {   // 리턴 가능한 변수가 2개라 RVO 불가
 
 이 구현은 컴파일러 마다 제각각이었으나 C++11 에서 [Copy Elision](http://en.cppreference.com/w/cpp/language/copy_elision)
 으로 표준화 한다.
-그리고 C++11 은 복사 문제를 위해 [우측값](http://en.cppreference.com/w/cpp/language/value_category)과 
+그리고 C++11 은 복사 문제를 위해 [우측값](http://en.cppreference.com/w/cpp/language/value_category)과
 [이동 생성자](http://en.cppreference.com/w/cpp/language/move_constructor)를 도입한다.
 
 ## 우측값(Rvalue), 이동 생성자

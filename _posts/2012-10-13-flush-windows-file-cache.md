@@ -111,7 +111,7 @@ Rammap 을 사용하면 어떤 파일이 Standby 상태로 메모리에 올라�
 Cacheset 의 Clear 기능은 Sysinternal 의 Cacheset 소개 페이지의 How It Works
 부분을 보면 어떻게 구현했는지 설명이 되어 있다.
 아래 소스처럼 (문서화되지 않은) NtSetSystemInformation 함수를 사용해 FileCache 의
-WorkingSet 크기를 조절한다. (최소소, 최대 값을 모두 -1 을 넣으면 Clear 로 동작한다.)
+WorkingSet 크기를 조절한다. (최소, 최대 값 모두 -1 을 넣으면 Clear 로 동작한다.)
 
 ```cpp
 SYSTEM_FILECACHE_INFORMATION i;
