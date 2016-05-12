@@ -1,5 +1,6 @@
 
 $main-font-stack: 'Open Sans', Arial, sans-serif;
+$source-font-stack: 'Ubuntu Mono', Arial, sans-serif;
 
 * { margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -107,6 +108,7 @@ a:hover { text-decoration: underline; }
 .site .post .content h6 { font-size: 1.1em; margin: 1.1em 0 0.1em 0; }
 
 .site .post .content code {
+  font-family: $source-font-stack;
   background: #f7f7f7;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -131,7 +133,7 @@ a:hover { text-decoration: underline; }
   font-size: 13px;
   line-height: 1.5em;
   margin: 20px 0;
-  
+
   .highlight { padding: 20px; }
 }
 
