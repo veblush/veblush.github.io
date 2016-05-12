@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>버전 관리 시스템의 마이그레이션 전략과 방법</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="ko"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/vcs-migration-strategy/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/vcs-migration-strategy/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <style>
+        html { overflow-y :scroll }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/ko/">
+              글
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/ko/about/">
+              소개
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a  class="top-about-link" href=" /posts/vcs-migration-strategy/ ">en</a>
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /ko/posts/vcs-migration-strategy/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">버전 관리 시스템의 마이그레이션 전략과 방법</h2>
+  <p class="meta">2012-10-31</p>
+
+  <div class="content">
+  <p>최근에 버전 관리 시스템 마이그레이션 작업을 진행하고 있고 작년에는 저장소 재구성 작업을 했었다.
+작업을 진행하면서 고민했던 마이그레이션 전략과 방법을 정리했다.</p>
+
+<h2 id="section">마이그레이션</h2>
+
+<p>저장소 마이그레이션은 예전 저장소에서 새 저장소로 데이터를 옮기는 과정이다.
+이 과정은 아래의 그림과 같이 예전 저장소에 있는 파일과 로그를 익스포트하는 과정과 여기서 얻은 데이터를 새 저장소로 임포트하는 과정으로 이루어진다.</p>
+
+<p><img src="/assets/posts/Repo.gv.png" alt="" /></p>
+
+<p>특히 마이그래이션 작업은 두 저장소가 다른 버전 관리 시스템에 있을 때 까다로워진다.
+만약 두 시스템의 리비전 모델이 많이 다른 경우라면 더욱 그렇다.
+예를 들어 subversion 의 경우 디렉토리도 파일과 같이 리비전 대상이 되지만
+mercurial 의 경우에는 그렇지 않다.
+때문에 subversion 의 mkdir 작업은 mercurial 에서는 빠져야 하고 반대로 mercurial 에서
+subversion 으로 올 때는 적당한 시점에 mkdir 작업을 임의로 넣어줘야 한다.
+(다행히 subversion → mercurial 은 <a href="https://bitbucket.org/durin42/hgsubversion/wiki/Home">hgsubversion</a>
+ 툴이 있어 간편하게 마이그레이션 할 수 있다)
+최대한 예전 저장소의 구조와 데이터를 유지하면서 마이그레이션을 할 수 있다면 좋겠지만
+그 만큼 개발 비용이 소모되니 절충안을 잘 선택해야 한다.
+이제 여러 전략을 살펴보고 장단점을 따져 최적의 방법을 골라보자.</p>
+
+<h2 id="section-1">예제 데이터, 전략의 이점</h2>
+
+<p>설명을 위해 아래와 같은 예제 저장소 데이터를 가정하자. </p>
+
+<p><img src="/assets/posts/Revision-A.gv.png" alt="" /></p>
+
+<p>가로축이 리비전 증가다. 리비전 1 부터 4 까지 총 4개의 리비전 변화가 있었다.
+저장소의 파일은 노드로 표시되고 “파일이름 &lt;내용&gt;” 형식으로 표현되어 있다.
+위 그림에서 리비전 2 에는 apple 과 banana 파일 있는 것을 알 수 있다.
+또 가장 최근 리비전 4 에는 banana 와 orange 파일이 있는 것을 알 수 있다.
+리비전이 증가함에 따라 파일이 변하는데 파일의 변화는 노드 사이를 잇는 선으로 표시한다.
+변화를 발생시키는 파일 변경 내용은 A(dd, 추가), M(odify, 변경), C(opy, 복사), D(elete, 삭제) 이렇게 네 가지가 있다.
+위 그림에서 리비전 2 → 3 과정을 보면 apple 파일은 삭제되고,
+banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터 복사되었음을 알 수 있다.</p>
+
+<p>각 마이그레이션 전략이 제공하는 이점이 있다.
+먼저 어떤 이점이 있는지 살펴보고 각 전략이 그 중 어떤 이점을 제공하는지 다루기로 하자.</p>
+
+<ul>
+  <li>
+    <p>현재 스냅샷 유지
+가장 마지막 리비전의 파일의 구성은 최소한 유지되어야 올바른 마이그레이션이다.
+과거 데이터가 어떻든 새 저장소에서 현재 파일을 받았을때 예전 저장소와 동일한 파일이 받아져야 한다.
+따라서 유지되어야할 필수 조건이다.
+(예제 데이터의 새 저장소에서 최신 리비전을 받으면 banana, orange 가 나와야 한다.)</p>
+  </li>
+  <li>
+    <p>과거 시점의 스냅샷의 완결성 유지
+과거 시점의 파일을 받았을 때 그 시점의 파일 구성이 올바르게 받아지는지 여부다.
+예를 들서 1년전 저장소 상태의 파일을 받겠다 라고 했을 때 그 때의 구성으로 올바르게 받아지는지 여부다.
+(예제 데이터의 리비전 2 데이터를 요청했을 때 정확히 apple 과 banana 가 받아져야 한다.)</p>
+  </li>
+  <li>
+    <p>현재 파일의 변경 내역 유지
+현재 스냅샷에 포함되어 있는 파일들의 변경 이력이 제대로 나오는지 여부다.
+현재 파일의 과거 버전을 받을 수도 있고 수정 내역을 통해 blame 을 할 수도 있다.
+(예제 데이터의 banana 이력을 요청하면 yellow → brown → black 으로 변해 왔는지를 알 수 있어야 한다.)</p>
+  </li>
+</ul>
+
+<p>그럼 어떤 전략이 있는지 살펴보자.</p>
+
+<h2 id="section-2">전략: 현재 스냅샷</h2>
+
+<p>현재 스냅샷 (마지막 리비전에 포함되어 있는 모든 파일) 을 새 저장소에 그대로 추가 하는 방식이다.
+과거 이력은 모두 무시하고 현재 파일만 이동하는 전략이다.
+새 저장소에 옮겨진 리비전의 모습은 아래 그림과 같으며 과거 리비전에 대한 정보가 모두 사라졌음을 볼 수 있다.</p>
+
+<p><img src="/assets/posts/Revision-B.gv.png" alt="" /></p>
+
+<p>이 방법은 간단하다. 단순히 예전 저장소의 최신파일을 받아 새 저장소에 추가하는 것으로 충분하다.
+때문에 마이그레이션 비용이 가장 적고 그래서 많이 사용되는 방법이기도 하다.
+만약 과거 리비전 로그를 살리는 것이 중요하지 않다면 좋은 방법이다.</p>
+
+<p>이점: 현재 스냅샷 유지</p>
+
+<h2 id="section-3">전략: 주요 스냅샷</h2>
+
+<p>중요 포인트가 되는 리비전들을 정하고 그 리비전들의 파일과 그 리비전 사이마다 차이를 남기는 방식이다.
+예를 들어 알파 테스트, 베타 테스트, 공개 오픈 이렇게 세 시점이 중요 포인트고 그 시점의 스냅샷과
+그 사이의 변화를 남기고 싶다면 이 방법을 사용할 수 있다.
+아래 그림은 중요 포인트로 리비전 2와 4를 선택했을 경우의 새 저장소의 리비전 모습이다.
+리비전 2, 4 시점의 파일은 정확히 남고 그 사이의 이력은 뭉게지는 것을 볼 수 있다.
+(banana 의 파일 내용이 yellow 에서 바로 black 이 되는 것이 한 예이다.)</p>
+
+<p><img src="/assets/posts/Revision-C.gv.png" alt="" /></p>
+
+<p>방법도 간단하다. 먼저 중요 포인트의 리비전에 해당하는 파일을 모두 받는다.
+이것을 리비전 별로 묶고 아래와 같은 절차를 밟는다.
+가장 첫 리비전에 포함되는 파일은 모두 그대로 새 저장소에 추가
+그 다음 리비전 r 에 대해서 포함되어 있는 파일에 대해서
+- 새 저장소에 없는 파일이 리비전 r 에 있다면 : Add file
+- 새 저장소에 있던 파일이 리비전 r 에 없다면 : Delete file
+- 새 저장소와 리비전 r 에 모두 있지만 내용이 다르다면 : Modify file</p>
+
+<p>위 내용을 새 저장소에 커밋. 마지막 리비전이 될 때까지 반복
+그다지 복잡하지 않다. 다만 새 저장소에 대해 위에서 설명한 리비전 변경 작업을 생성해 내고
+수행 하는 스크립트 작업을 해야 한다. 하지만 상대적으로 간단한 기능만으로 가능하기 때문에 수월한 편이다.
+또한 중요 포인트를 촘촘히 설정하면 이력이 뭉게지는 범위를 좁힐 수 있다.</p>
+
+<p>이점: 최근 스냅샷 유지 + (주요) 과거 시점의 스냅샷의 완결성 유지</p>
+
+<h2 id="section-4">전략: 현재 파일의 변경 로그 유지</h2>
+
+<p>과거 스냅샷 보다는 현재 파일이 어떻게 변해왔는지를 유지하는게 중요하다면
+현재 파일의 변경 로그 유지 방법을 사용해볼 수 있다.
+이 방법은 마지막 리비전에 있는 파일과 이력만 새 저장소로 마이그레이션 하는 방법이다.
+예제 데이터의 마지막 리비전 4에는 banana 와 orange 파일이 있는데
+이 파일에 대한 이력만 추려서 새 저장소를 구성하면 아래와 같은 그림을 얻을 수 있다.
+이 방법은 현재 남아있는 파일의 이력이 남기 때문에 blame 등의 기능을 종전과 같이 그대로 사용할 수 있는 장점이 있다.</p>
+
+<p><img src="/assets/posts/Revision-D.gv.png" alt="" /></p>
+
+<p>구현은 예전 저장소에 있는 모든 파일들의 과거 이력을 얻는 것으로 시작한다.
+개별 이력을 얻는 것이 보통의 버전 관리 시스템은 빠르지 않기 때문에 파일이
+많은 경우 전체 리비전 정보로 부터 개별 파일 정보를 재구축 하는 것이 효율적이다.</p>
+
+<p>예전 저장소 모든 리비전 r 에 대해 순서대로
+리비전 r 에 해당하는 현재 파일의 이력이 있는 경우
+- 그 파일의 첫 로그라면: Add file
+- 그렇지 않은 경우라면: Modify file</p>
+
+<p>새 저장소에 변경 내용 커밋
+이 방법 역시 그다지 복잡하지 않다. 예전 저장소에서 개별 파일 이력을 얻는 부분도
+일반적으로 대부분의 버전 관리 시스템이 지원하기 때문에 손쉽게 얻을 수 있다.
+새 저장소에 파일을 추가하고 변경 내역을 구축하는 것도 Add 와 Modify 기능만으로 가능하기 때문에 간단하다.
+특히 소스 저장소의 blame 을 그대로 사용할 수 있어 좋다.
+또한 이미 삭제된 파일에 대한 데이터를 옮기지 않아 새 저장소 용량 절감 효과도 있다.</p>
+
+<p>이점: 최근 스냅샷 유지 + 현재 파일의 변경 사항 로그 유지</p>
+
+<h2 id="section-5">전략: 변경 리플레이</h2>
+
+<p>예전 저장소의 모든 파일과 변경 이력을 최대한 그대로 마이그레이션 하고 싶다면
+리비전 로그를 순서대로 새 저장소에서 동등하게 재현하는 변경 리플레이 방법을 사용할 수 있다.
+이 방법은 최대한 모든 데이터를 그대로 새 저장소에 넣는 방식이기 때문에
+매끄러운 마이그레이션이 가능하지만 그 만큼 비용이 많이 들 수 있다.
+특히 서로 다른 버전 관리 시스템 간의 마이그레이션의 경우 제공되는 마이그레이션 솔루션이
+없다면 손이 많이 가는 작업이 될 가능성이 높다.
+만약 1:1 로 완벽하게 마이그레이션이 가능하다면 아래 그림처럼 예제와 동일한 로그가 새 저장소에 구축된다.</p>
+
+<p><img src="/assets/posts/Revision-A.gv.png" alt="" /></p>
+
+<p>방법은 기본적으로 간단하다. 예전 저장소의 변경 내용을 순서대로 새 저장소에 적용하면 된다.
+예전 저장소 모든 리비전 r 에 대해 순서대로
+리비전 r 을 구성하는 변경 로그에 대해서
+- 변경 로그가 add 면 새 저장소에 add
+- 변경 로그가 modify 면 새 저장소에 modify
+- 변경 로그가 delete 면 새 저장소에 delete
+- …</p>
+
+<p>새 저장소에 변경 내용 커밋
+서로 다른 저장소의 경우 리비전 변경을 구성하는 집합 (add, modify, …) 이
+달라 변환 과정이 필요한 경우가 많다.
+따라서 완전한 구현을 목표로 하기 보다는 가능한 변경 집합을 제한하고 처리할 수 없는 것은
+적당히 예외 처리하는 것이 현실적이다.
+(예를 들어 브랜치는 기본 모델 부터 다른 경우도 있다.)
+적당한 선에서 탑협을 해 이 방법을 사용할 수 있다면 가장 완전한 마이그레이션이 될 수 있다.</p>
+
+<p>이점: 현재 스냅샷 파일 유지 + 과거 시점의 스냅샷의 완결성 유지 + 현재 파일의 변경 내역 유지 </p>
+
+<h2 id="section-6">전략: 최신 스냅샷 + 현재 파일의 변경 로그 유지</h2>
+
+<p>기본적으로 최신 스냅샷을 사용하되 중요 파일에 대해서만 현재 파일의 변경 로그 유지 방법을 사용한다.
+아래 그림은 orange 에 대해서는 최신 스냅샷을 banana 에 대해서는 변경 로그 유지를 적용한 예이다.</p>
+
+<p><img src="/assets/posts/Revision-F.gv.png" alt="" /></p>
+
+<p>방법은 현재 파일 변경 로그 유지와 유사하다.
+중요 파일은 기존과 같게 동작하도록 하고 그렇지 않은 파일에 대해서 로그를 옮기지 않으면 된다.
+이 방법은 새 저장소의 용량을 절약할 수 있는 장점이 있다.</p>
+
+<p>이점: 최근 스냅샷 유지 + (중요) 현재 파일의 변경 사항 로그 유지</p>
+
+<h2 id="section-7">전략: 주요 스냅샷 + 현재 파일의 변경 로그 유지</h2>
+
+<p>기본적으로 주요 스냅샷을 사용하고 마지막 스냅샷과 직전 스냅샷 사이는
+변경 로그 유지 기능을 사용해 최근 변경 로그를 유지 하는 방법이다.
+아래는 리비전 2, 4 를 주요 스냅샷으로 남기고 리비전 2 → 4 사이의 변경 로그를 유지한 예이다.</p>
+
+<p><img src="/assets/posts/Revision-E.gv.png" alt="" /></p>
+
+<p>방법은 마지막 리비전 직전까지는 주요 스냅샷과 동일하고 마지막 리비전 단계에서
+현재 파일의 변경 로그 유지 방법과 동일하다. 이 방법은 주요 스냅샷을 재구성할 수 있고
+현재 파일들의 최근 변경 사항을 확인할 수 있는데 특히 변경 이력은 과거는 그다지
+상세할 필요가 없는데 반해 최근은 상세한 것이 좋기 때문에 적절히 균형을 맞춘 것이라 볼 수 있다.
+과거 이력을 상세히 남기지 않기 때문에 저장소의 공간을 절약하는 장점이 있다.</p>
+
+<p>이점: 최근 스냅샷 유지 + (주요) 과거 시점의 스냅샷의 완결성 유지 + 현재 파일의 (최근) 변경 사항 로그 유지</p>
+
+<h2 id="section-8">브랜치</h2>
+
+<p>브랜치는 앞서 설명한 트렁크에 발생하는 작업 이력에 비해 복잡하다.
+특히 버전 관리 시스템 마다 특징히 달라 저장소 리플레이로 커버하기 어려울 수 있다.
+이럴 때는 브랜치가 생성되는 시점과 브랜치 마지막 시점을 주요 스냅샷 방법을 사용해
+구성해 주는 간단한 방법을 사용하는 것이 좋다.
+보통 브랜치 보다는 트렁크의 로그가 중요하기 때문에 브랜치 시점과 현재 모습을 유지하는 쪽이 좋다.</p>
+
+<h2 id="section-9">주요 버전 컨트롤 시스템의 명령 예</h2>
+
+<p>마이그레이션 작업 때 다뤄봤던 subversion, mercurial, perforce 의 대략의 사용법과 팁을 남겨둔다.</p>
+
+<h3 id="subversion">Subversion</h3>
+
+<p>익스포트 작업 주요 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>svn list path                    <span class="c"># 디렉토리/파일 목록 출력</span>
+svn log                          <span class="c"># 저장소 리비전 로그 출력</span>
+svn log -v -r rev                <span class="c"># 리비전 작업 내용 출력</span>
+svn cat -r rev path &gt; savepath   <span class="c"># 특정 리비전 때의 파일 내용 저장</span>
+</code></pre>
+</div>
+
+<p>파일 작업 주요 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>svn add filename                 <span class="c"># 추가</span>
+svn delete filename              <span class="c"># 삭제</span>
+svn move oldpath newpath         <span class="c"># 이동</span>
+svn copy srcpath dstpath         <span class="c"># 복사</span>
+</code></pre>
+</div>
+
+<p>커밋 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>svn commit -m LOG
+svn propset --revprop -r HEAD svn:author AUTHOR
+svn propset --revprop -r HEAD svn:date 2012-10-27T00:30:15.000000Z
+</code></pre>
+</div>
+
+<p>SVN 의 propset 을 사용하기 위해서는 서버의 pre-revprop-change 가 exit 1 등으로 설정되어 있어야 한다.
+그리고 svn:data 는 UTC 시간이다.
+특히 Subversion 은 commit 을 저장소 루트 디렉토리하는 것이 원칙이나 빠르게
+처리 하기 위해 변경이 발생한 디렉토리의 공통 부모 디렉토리에서 하는 것이 좋다.
+(가끔 update 가 필요하다고 svn 이 에러를 내면 저장소 루트에서 update 를 한 번 수행하면 해결이 된다)</p>
+
+<h3 id="mercurial">Mercurial</h3>
+
+<p>익스포트 작업 주요 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>hg log                           <span class="c"># 저장소 리비전 로그 출력</span>
+hg log -v -r rev                 <span class="c"># 리비전 작업 내용 출력</span>
+hg cat -r rev path &gt; savepath    <span class="c"># 특정 리비전 때의 파일 내용 저장</span>
+</code></pre>
+</div>
+
+<p>파일 작업 주요 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>hg add filename                  <span class="c"># 추가</span>
+hg remove filename               <span class="c"># 삭제</span>
+hg rename oldpath newpath        <span class="c"># 이동</span>
+hg copy srcpath dstpath          <span class="c"># 복사</span>
+</code></pre>
+</div>
+
+<p>커밋 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>hg commit -m LOG -u AUTHOR -d <span class="s2">"2012-10-27 09:30:15"</span>
+</code></pre>
+</div>
+
+<p>Subversion 과 비슷하다.
+하지만 DVCS 라서 commit 명령어에서 자유롭게 author 와 date 를 지정할 수 있는 것이 특징이다.
+또한 저장소가 로컬에 있기 때문에 디렉토리/파일 목록은 dir, ls 등을 사용하면 된다.
+hg 의 경우 실제 변경사항이 없는데 commit 을 요청하면 에러를 발생하니 이 부분에 대한 예외 처리가 필요하다.</p>
+
+<h3 id="perforce">Perforce</h3>
+
+<p>익스포트 작업 주요 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>p4 <span class="o">[</span><span class="nb">dirs</span>/files] path             <span class="c"># 디렉토리/파일 목록 출력</span>
+p4 changes                       <span class="c"># 저장소 리비전 로그 출력</span>
+p4 describe rev                  <span class="c"># 리비전 작업 내용 출력</span>
+p4 print -o savepath path@rev    <span class="c"># 특정 리비전 때의 파일 내용 저장</span>
+</code></pre>
+</div>
+
+<p>파일 작업 주요 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>p4 edit filename                 <span class="c"># 편집</span>
+p4 add filename                  <span class="c"># 추가</span>
+p4 delete filename               <span class="c"># 삭제</span>
+p4 rename oldpath newpath        <span class="c"># 이동</span>
+p4 copy srcpath dstpath          <span class="c"># 복사</span>
+</code></pre>
+</div>
+
+<p>커밋 명령어</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>p4 submit -d LOG
+p4 change -o REV | change <span class="s2">"Date:"</span> <span class="s2">"User:"</span> | p4 change -i -f
+</code></pre>
+</div>
+
+<p>Perforce 는 checkout 방식이므로 편집 전에 수정 요청을 해야한다.
+그리고 perforce 의 경우 파일타입 설정에 주의를 기울여야 한다.
+(잘못 설정하면 파일이 깨지거나 submit 단계에 에러가 나거나 p4merge 에서 이상하게 나올 수 있다.
+ 마이그레이션 작업전에 <a href="http://www.perforce.com/perforce/doc.current/manuals/p4guide/ab_filetypes.html">p4_filetypes</a>
+ 내용을 잘 살펴봐야 한다.)
+또한 파일이름에 <code class="highlighter-rouge">@</code> <code class="highlighter-rouge">#</code> <code class="highlighter-rouge">*</code> <code class="highlighter-rouge">%</code> 문자가 포함되어 있는 경우 이스케입을 해줘야 한다.</p>
+
+<h2 id="section-10">결론</h2>
+
+<p>저장소 마이그레이션의 여러 전략을 살펴보았다.
+각 전략의 이점과 비용을 잘 살펴보고 최적의 방법을 결정하는 것이 중요하다.
+또 저장소의 데이터는 프로젝트의 중요한 자산이니 무엇보다도 안전하게 누락없이 데이터를 옮기는데 주의를 기울여야 한다.</p>
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/ko/posts/vcs-migration-strategy/"
+       data-text="버전 관리 시스템의 마이그레이션 전략과 방법" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "ko";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/ko/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

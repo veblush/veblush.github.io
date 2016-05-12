@@ -1,0 +1,20 @@
+digraph G {
+
+rankdir=LR
+#ranksep="0.3 equally"
+size=4
+
+node [ fontname="Helvetica" fontsize="20"] 
+edge [ fontname="Helvetica" fontsize="20"]
+
+repoo [ shape="doubleoctagon" style="filled" color=lightgray label="Old\nRepository" group=a]
+repon [shape="doubleoctagon" style="filled" color=lightgray label="New\nRepository" group=a]
+
+repoo -> dummy -> repon [ style="invis" ]
+dummy [group=a shape=none label=""]
+
+data [ label="file\nlog" group=b]
+repoo -> data [ label="export" ]
+data -> repon [ label="import" ]
+
+}

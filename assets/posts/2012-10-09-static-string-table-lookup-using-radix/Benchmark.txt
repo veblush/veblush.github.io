@@ -1,0 +1,32 @@
+***** _DATA_ = 1 *****
+
+strlen              : 3us
+sorted_vector       : 17us
+map                 : 12us
+unordered_map       : 20us
+static              : 8us
+dynamic             : 13us
+static_len          : 2us
+dynamic_len         : 9us
+
+***** _DATA_ = 2 *****
+
+strlen              : 3us
+sorted_vector       : 20us
+map                 : 15us
+unordered_map       : 19us
+static              : 4us
+dynamic             : 16us
+static_len          : 2us
+dynamic_len         : 12us
+
+***** _DATA_ = 3 *****
+
+strlen              : 6us
+sorted_vector       : 33us
+map                 : 24us
+unordered_map       : 29us
+static              : 19us
+dynamic             : 25us
+static_len          : 15us
+dynamic_len         : 20us

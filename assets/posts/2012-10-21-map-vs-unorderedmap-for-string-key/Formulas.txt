@@ -1,0 +1,6 @@
+\lceil \frac{d+1}{\log_{2}|A|} \rceil 
+
+
+\sum_{d=0}^{\log_{2}n}\lceil \frac{d+1}{\log_{2}|A|} \rceil 
+\approx 
+\frac{(\log_{2}n)^{2}}{2\log_{2}|A|}

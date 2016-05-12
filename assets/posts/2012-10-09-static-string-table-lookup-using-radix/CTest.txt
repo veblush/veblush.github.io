@@ -1,0 +1,4 @@
+apple	1
+apps	2
+bana	3
+banana	4
