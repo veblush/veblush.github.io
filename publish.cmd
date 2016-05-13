@@ -2,7 +2,7 @@ SET TEMPDIR="..\jekyll_output"
 
 REM Build pages
 rd /s/q %TEMPDIR%
-jekyll build -d %TEMPDIR%
+call jekyll build -d %TEMPDIR%
 
 REM Update site with built pages
 git checkout master
