@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>왜 블로그를 Jekyll 로 갈아탔나</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="ko"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/why-move-to-jekyll/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/why-move-to-jekyll/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/ko/">
+              글
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/ko/about/">
+              소개
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a  class="top-about-link" href=" /posts/why-move-to-jekyll/ ">en</a>
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /ko/posts/why-move-to-jekyll/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">왜 블로그를 Jekyll 로 갈아탔나</h2>
+  <p class="meta">2016-05-13</p>
+
+  <div class="content">
+  <p>2012 년에 블로그를 처음 만들었을 때 빠르게 만들기 위해 블로그 서비스를 사용했었다.
+블로그를 빌딩하는 것 보다 글을 쓰는 것이 우선이라 쉽고 빠른 방법을 사용했었는데 아쉬운 점이 몇가지 있었다.
+그래도 이게 어디야 하며 참고 사용하다가 이번에 시간이 나서 좀 더 나은 방법으로 바꿔보기로 했다.</p>
+
+<h2 id="section">블로그 서비스의 아쉬운 점</h2>
+
+<h5 id="section-1"># 코드, 수식 삽입이 쉽지 않음</h5>
+
+<p>코드 삽입이 쉽지 않다. 하지만 나는 대부분의 글에 코드를 삽입해야 하는데 이 때마다
+HTML 모드로 바꿔서 코드 넣고 다시 문서 모드로 바꿔 글을 작성하는 것이 여간 번거로운 것이 아니다.</p>
+
+<p>수식 삽입도 쉽지 않다. 외부에서 수식을 만들어 동적으로 이미지를 만드는 서비스를
+사용해 이미지 링크만 임베딩 하는 것을 사용했는데 이것 역시 번거롭다. 게다가 글에 외부 종속이
+생겨 해당 서비스가 장애가 생기거나 종료되면 수식 이미지가 사라지는 약점도 있다.</p>
+
+<h5 id="section-2"># 도표의 원본 파일을 별도로 보관 해야 함</h5>
+
+<p>GraphViz 나 Excel 을 사용해 도표 이미지를 만들어 글에 포함하는 경우가 있는데 이 때 원본 파일을
+따로 보관해야만 한다. 추후 업데이트를 위해 원본을 보관해야 하는데 별도의 저장소를 따로 만드는 것이
+번거로울 뿐 아니라 종종 잊어버린다. 이를 블로그 어딘가에 넣어두면 좋지 않을까.</p>
+
+<h2 id="jekyll---">Jekyll 을 고른 이유</h2>
+
+<h5 id="section-3"># 코드, 수식 삽입이 간단함</h5>
+
+<p>Markdown 을 사용하는데 익숙하다면 이 이상 쉬워질 수 있을까 싶을 정도로 간단한다.
+Jekyll 이 기본 제공하는 markdown 엔진이 kramdown 인데 얘가 코드와 수식을 알아서 잘 보여준다.</p>
+
+<p>코드는 다음과 같이 언어별로 문법 하이라이팅도 잘되어 표현된다.</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">fancyAlert</span><span class="p">(</span><span class="nx">arg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">arg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">facebox</span><span class="p">({</span><span class="na">div</span><span class="p">:</span><span class="s1">'#foo'</span><span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>수식도 LaTeX 포맷으로 입력하면 다음과 같이 보여준다.</p>
+
+<script type="math/tex; mode=display">\frac{n!}{k!(n-k)!} = {n \choose k}</script>
+
+<h5 id="github---"># Github 저장소에서 호스팅 가능</h5>
+
+<p>Github 이 pages 서비스를 제공하는데 이러면 저장소를 하나 만들어 블로그 호스팅 용도로 사용할 수 있다.
+때문에 호스팅 비용이 별도로 들지 않고 동시에 github 저장소에 도표등의 원본을 함께 보관할 수 있는 이점도 된다.</p>
+
+<h5 id="section-4"># 간단한 구조, 높은 커스터마이징</h5>
+
+<p>Jekyll 이 일반 문서를 웹 페이지로 컨버팅 하는 간단한 둘이라 이해하기 쉬우며 사실상 모든 것이 가능하다.
+다만 큰 커스터마이징은 큰 노동을 필요로 할 뿐.
+나의 경우에는 영문을 지원하기 위해 다국어 지원 플러그인 <a href="https://untra.github.io/polyglot/">polyglot</a> 을 사용했다.</p>
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/ko/posts/why-move-to-jekyll/"
+       data-text="왜 블로그를 Jekyll 로 갈아탔나" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "ko";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/ko/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

@@ -6,9 +6,83 @@
     <description>blog for veblush, programmer</description>
     <link>http://veblush.github.io/</link>
     <atom:link href="http://veblush.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 13 May 2016 09:23:29 +0900</pubDate>
-    <lastBuildDate>Fri, 13 May 2016 09:23:29 +0900</lastBuildDate>
+    <pubDate>Fri, 13 May 2016 16:17:55 +0900</pubDate>
+    <lastBuildDate>Fri, 13 May 2016 16:17:55 +0900</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
+    
+      <item>
+        <title>Why I move to Jekyll for my blog</title>
+        <description>&lt;p&gt;I used common blog service in creating my blog at 2012.
+Blog service was good to write blog right after a few clicks even
+it had some drawbacks.
+Theseday I have some spare time for this and decide to change it.&lt;/p&gt;
+
+&lt;h2 id=&quot;drawbacks-of-blog-service&quot;&gt;Drawbacks of blog service&lt;/h2&gt;
+
+&lt;h5 id=&quot;not-easy-to-embed-code-and-math-expression&quot;&gt;# Not easy to embed code and math expression&lt;/h5&gt;
+
+&lt;p&gt;Embeding code is not easy. My blog has lots of code blocks to be embeded.
+Whenever code need to be inserted, I switch blog to HTML mode and insert
+a few HTML code for that and switch it back to writing mode,
+which is quite bothersome.&lt;/p&gt;
+
+&lt;p&gt;Embeding math expression is not easy, too. There is a nice web service to
+provide the way to convert LaTeX math expression to an image dynamically.
+I used it happily but it requires some manual steps. Also my blog depends on
+external service that could be down for maintenance or disappear forever.&lt;/p&gt;
+
+&lt;h5 id=&quot;need-to-store-original-data-of-diagram-separately&quot;&gt;# Need to store original data of diagram separately&lt;/h5&gt;
+
+&lt;p&gt;GraphViz and Excel are used for authoring graph and chart which are converted
+to images and inserted to blog. For futhur updates, source files
+should be stored but because blog service does not provide storage, I backup
+these files to the separate place, which is tiresome and easy to forget.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-i-choose-jekyll&quot;&gt;Why I choose Jekyll&lt;/h2&gt;
+
+&lt;h5 id=&quot;easy-to-embed-code-and-math-expression&quot;&gt;# Easy to embed code and math expression&lt;/h5&gt;
+
+&lt;p&gt;If you are accustomed to using markdown, it is really hard to imagine a better
+way than using markdown to insert a code block.
+Jekyll uses &lt;a href=&quot;http://kramdown.gettalong.org/&quot;&gt;kramdown&lt;/a&gt; as a default
+markdown engine which is goot at dealing with code and math expression.&lt;/p&gt;
+
+&lt;p&gt;Code block with syntax highlighting is rendered like:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fancyAlert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;arg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;arg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;facebox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;#foo&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Math expression by LaTeX format is rendered like:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{n!}{k!(n-k)!} = {n \choose k}&lt;/script&gt;
+
+&lt;h5 id=&quot;hosting-on-github&quot;&gt;# Hosting on Github&lt;/h5&gt;
+
+&lt;p&gt;Github provides pages service for hosting a static web site.
+It’s free and good to keep original source files of diagram and chart along with web site.&lt;/p&gt;
+
+&lt;h5 id=&quot;simple-architecture-and-highly-customizable&quot;&gt;# Simple architecture and highly customizable&lt;/h5&gt;
+
+&lt;p&gt;Jekyll is a simple tool to transform plain texts to htmls.
+It’s easy to understand and can be customized as you want.
+With greate customization comes great labor.
+In my case, multi langauge plugin &lt;a href=&quot;https://untra.github.io/polyglot/&quot;&gt;polyglot&lt;/a&gt; is used to support
+english and korean at the same time.&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 13 May 2016 00:00:00 +0900</pubDate>
+        <link>http://veblush.github.io/posts/why-move-to-jekyll/</link>
+        <guid isPermaLink="true">http://veblush.github.io/posts/why-move-to-jekyll/</guid>
+        
+        
+        <category>blog</category>
+        
+      </item>
     
       <item>
         <title>Python n-grouper</title>
@@ -123,19 +197,6 @@
         <pubDate>Sun, 21 Oct 2012 00:00:00 +0900</pubDate>
         <link>http://veblush.github.io/posts/map-vs-unorderedmap-for-string-key/</link>
         <guid isPermaLink="true">http://veblush.github.io/posts/map-vs-unorderedmap-for-string-key/</guid>
-        
-        
-        <category>cpp</category>
-        
-      </item>
-    
-      <item>
-        <title>Make from VC++ Project</title>
-        <description>&lt;p&gt;&lt;em&gt;Oops sorry! English post is not available.&lt;/em&gt;&lt;/p&gt;
-</description>
-        <pubDate>Tue, 16 Oct 2012 00:00:00 +0900</pubDate>
-        <link>http://veblush.github.io/posts/make-from-visualcpp-project/</link>
-        <guid isPermaLink="true">http://veblush.github.io/posts/make-from-visualcpp-project/</guid>
         
         
         <category>cpp</category>

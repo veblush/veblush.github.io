@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>Why I move to Jekyll for my blog</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="en"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/why-move-to-jekyll/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/why-move-to-jekyll/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/">
+              Posts
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/about/">
+              About
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /posts/why-move-to-jekyll/ ">en</a>
+          
+            <a  class="top-about-link" href=" /ko/posts/why-move-to-jekyll/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">Why I move to Jekyll for my blog</h2>
+  <p class="meta">2016-05-13</p>
+
+  <div class="content">
+  <p>I used common blog service in creating my blog at 2012.
+Blog service was good to write blog right after a few clicks even
+it had some drawbacks.
+Theseday I have some spare time for this and decide to change it.</p>
+
+<h2 id="drawbacks-of-blog-service">Drawbacks of blog service</h2>
+
+<h5 id="not-easy-to-embed-code-and-math-expression"># Not easy to embed code and math expression</h5>
+
+<p>Embeding code is not easy. My blog has lots of code blocks to be embeded.
+Whenever code need to be inserted, I switch blog to HTML mode and insert
+a few HTML code for that and switch it back to writing mode,
+which is quite bothersome.</p>
+
+<p>Embeding math expression is not easy, too. There is a nice web service to
+provide the way to convert LaTeX math expression to an image dynamically.
+I used it happily but it requires some manual steps. Also my blog depends on
+external service that could be down for maintenance or disappear forever.</p>
+
+<h5 id="need-to-store-original-data-of-diagram-separately"># Need to store original data of diagram separately</h5>
+
+<p>GraphViz and Excel are used for authoring graph and chart which are converted
+to images and inserted to blog. For futhur updates, source files
+should be stored but because blog service does not provide storage, I backup
+these files to the separate place, which is tiresome and easy to forget.</p>
+
+<h2 id="why-i-choose-jekyll">Why I choose Jekyll</h2>
+
+<h5 id="easy-to-embed-code-and-math-expression"># Easy to embed code and math expression</h5>
+
+<p>If you are accustomed to using markdown, it is really hard to imagine a better
+way than using markdown to insert a code block.
+Jekyll uses <a href="http://kramdown.gettalong.org/">kramdown</a> as a default
+markdown engine which is goot at dealing with code and math expression.</p>
+
+<p>Code block with syntax highlighting is rendered like:</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">fancyAlert</span><span class="p">(</span><span class="nx">arg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">arg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">facebox</span><span class="p">({</span><span class="na">div</span><span class="p">:</span><span class="s1">'#foo'</span><span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Math expression by LaTeX format is rendered like:</p>
+
+<script type="math/tex; mode=display">\frac{n!}{k!(n-k)!} = {n \choose k}</script>
+
+<h5 id="hosting-on-github"># Hosting on Github</h5>
+
+<p>Github provides pages service for hosting a static web site.
+It’s free and good to keep original source files of diagram and chart along with web site.</p>
+
+<h5 id="simple-architecture-and-highly-customizable"># Simple architecture and highly customizable</h5>
+
+<p>Jekyll is a simple tool to transform plain texts to htmls.
+It’s easy to understand and can be customized as you want.
+With greate customization comes great labor.
+In my case, multi langauge plugin <a href="https://untra.github.io/polyglot/">polyglot</a> is used to support
+english and korean at the same time.</p>
+
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/posts/why-move-to-jekyll/"
+       data-text="Why I move to Jekyll for my blog" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "en";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>
