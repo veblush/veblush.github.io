@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>How I build my blog using Jekyll</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="en"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/how-build-blog-using-jekyll/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/how-build-blog-using-jekyll/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/">
+              Posts
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/about/">
+              About
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /posts/how-build-blog-using-jekyll/ ">en</a>
+          
+            <a  class="top-about-link" href=" /ko/posts/how-build-blog-using-jekyll/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">How I build my blog using Jekyll</h2>
+  <p class="meta">2016-05-14</p>
+
+  <div class="content">
+  <p>Recently I has been building blog. It was expected to take
+at most 2 days but more time spent because of some traps.
+But anyway it’s done!</p>
+
+<h2 id="requirements">Requirements</h2>
+
+<ul>
+  <li>Simple UI</li>
+  <li>Easy to insert code blocks and math expressions</li>
+  <li>Supports both english and korean</li>
+</ul>
+
+<h2 id="works">Works</h2>
+
+<h5 id="create-github-repository"># Create Github repository</h5>
+
+<p>Personal github repository 
+<a href="https://github.com/veblush/veblush.github.io">veblush.github.io</a> is created
+for hosting blog by <a href="https://pages.github.com/">Github Pages</a> service.
+Github provides the neat way to build sites from Jekyll source pages automatically
+but it cannot be used because using plugins is not allowed by github.
+So manual build process have to be prepared.</p>
+
+<h5 id="install-jekyll-3"># Install Jekyll 3</h5>
+
+<p><a href="https://jekyllrb.com/">Jekyll</a> 3.1.3 is installed.
+With ruby gem utility, it is quite easy.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; gem install jekyll
+</code></pre>
+</div>
+
+<h5 id="theme"># Theme</h5>
+
+<p>I don’t have the ability to design web sites and don’t have time to do it, either.
+So I decided to use theme but choosing right theme among tons of themes is really
+time-consuming and hard-to-pick work.
+But accidently tidy blog <a href="http://nithinbekal.com">nithinbekal</a> was found and
+the theme of that was chosen to use. It looks simple and best fit to my requirement.
+Based on this theme, layout and css has been modified slightly.</p>
+
+<h5 id="setup-polyglot-plugin"># Setup Polyglot plugin</h5>
+
+<p>Official i18n support is not provided by Jekyll. There are a few ways for supporting it.
+<a href="http://untra.github.io/polyglot/">Polyglot</a> was chosen for this blog
+because it seemed simple to use and neat. 
+However it took many hours to setup it because I was not familar with
+the detail of Jekyll and there was a weird bug of polyglot active on windows.
+Finally this bug is <a href="https://github.com/untra/polyglot/commit/3280a2d84da1a36929fb5615426349dc6cccf4c3">fixed</a>
+and it works well now.</p>
+
+<h5 id="setup-asset-path-plugin"># Setup Asset Path plugin</h5>
+
+<p>It seems better to allocate local storage for each post because some of post have
+lots of images or diagrams generated with graphviz which are not shared by other posts.
+<a href="https://github.com/samrayner/jekyll-asset-path-plugin">Jekyll Asset Path</a> is installed for this.
+It works well and is slightly modified to support Polyglot and my own directory naming rule.</p>
+
+<h5 id="import-old-blogs"># Import old blogs</h5>
+
+<p>All posts from previous blog can be imported as HTML format. These HTML articles are tranformed
+to markdown with <a href="https://www.pandadoc.com/">Pandadoc</a>. Most of them are good but there are some
+incorrect markdowns that should be corrected by hand.
+Image links are changed to fit asset directory and math expressions are converted to
+kramdown <a href="http://kramdown.gettalong.org/math_engine/mathjax.html">form</a>.
+Fortunately it doens’t take long because there are not many articles to be imported.</p>
+
+<h5 id="write-publish-script"># Write publish script</h5>
+
+<p>Two branches are created on Github repository.</p>
+
+<ul>
+  <li>site branch: Working branch for storing original source of blog.</li>
+  <li>master branch: Output branch for storing the result of Jekyll from site branch.</li>
+</ul>
+
+<p><a href="https://github.com/veblush/veblush.github.io/blob/site/publish.cmd">Publish script</a>
+will run Jekyll at site branch and copy output to master branch to update blog.</p>
+
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/posts/how-build-blog-using-jekyll/"
+       data-text="How I build my blog using Jekyll" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "en";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

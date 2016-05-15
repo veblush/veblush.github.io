@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>Jekyll 로 어떻게 블로그를 만들었나</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="ko"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/how-build-blog-using-jekyll/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/how-build-blog-using-jekyll/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/ko/">
+              글
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/ko/about/">
+              소개
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a  class="top-about-link" href=" /posts/how-build-blog-using-jekyll/ ">en</a>
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /ko/posts/how-build-blog-using-jekyll/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">Jekyll 로 어떻게 블로그를 만들었나</h2>
+  <p class="meta">2016-05-14</p>
+
+  <div class="content">
+  <p>지난 며칠동안 Jekyll 로 블로그를 만들었다. 길어야 이틀이면 만들 수 있을 줄 알았는데
+몇몇 난관에 부딪혀 예상보다 오래걸렸다. 뭐 그래도 완성!</p>
+
+<h2 id="section">필요 조건</h2>
+
+<ul>
+  <li>심플한 UI 를 가질 것</li>
+  <li>간결한 코드, 수식 입력이 가능할 것</li>
+  <li>영어, 한국어를 동시에 지원할 것</li>
+</ul>
+
+<h2 id="section-1">작업</h2>
+
+<h5 id="github--"># Github 저장소 만들기</h5>
+
+<p><a href="https://pages.github.com/">Github Pages</a> 서비스를 사용하기 위해 개인 github 저장소
+<a href="https://github.com/veblush/veblush.github.io">veblush.github.io</a> 를 만들었다.
+Github 이 Jekyll 을 지원해 페이지 소스만 올리면 자동으로 사이트를 빌드해주는 편리한 기능도
+지원하고 있으나 이 블로그의 경우 github 이 지원하지 않는 Jekyll 플러그인을 사용하기로
+결정해 빌드는 수동으로 하기로 했다.</p>
+
+<h5 id="jekyll-3-"># Jekyll 3 설치</h5>
+
+<p><a href="https://jekyllrb.com/">Jekyll</a> 3.1.3 을 설치했다.
+Ruby 의 gem 툴을 사용해 간단히 설치할 수 있다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; gem install jekyll
+</code></pre>
+</div>
+
+<h5 id="section-2"># 테마 선정</h5>
+
+<p>Theme 을 만들기엔 능력도 부족하고 시간도 없어 이미 있는 테마를 골라 사용하기로 했다.
+다른 여러 테마를 보고 고르는게 생각보다 시간을 많이 써야하고 고민스러운 일이다.
+테마 사이트에서 여러 테마를 보면서 갈피를 못잡다가 정작 눈에 띈 것은 우연히 방문한
+<a href="http://nithinbekal.com">nithinbekal</a> 블로그의 테마였다.
+깔끔하고 간결한 것이 처음 목적으로 했던 심플한 UI 를 만드는데 적합해 보였다.
+이 테마를 기본으로 취향에 맞춰 layout 과 css 를 살짝 수정했다.</p>
+
+<h5 id="polyglot--"># Polyglot 플러그인 적용</h5>
+
+<p>Jekyll 은 다국어 지원을 기본적으로 제공하고 있지 않다. 이를 지원하기 위해
+여러가지 방법이 있는데 <a href="http://untra.github.io/polyglot/">Polyglot</a> 을 사용하기로 했다.
+사용하기 쉬워보이는 첫인상 때문이었다. 하지만 이해하고 적용하는데 시간을 많이 소모했는데
+결론적으로 플러그인이 윈도우 환경에서 잘 동작하지 않는 버그 때문이었다.
+Jekyll 에 익숙하지 않으니 버그가 있는 것인지 내가 뭘 잘못 사용 하는 것인지 구분이 되지 않아
+문제를 파악하는데 시간이 좀 걸렸었다.
+해당 버그의 <a href="https://github.com/untra/polyglot/commit/3280a2d84da1a36929fb5615426349dc6cccf4c3">수정</a>
+PR 이 받아들여져 이제는 문제 없이 사용할 수 있다.</p>
+
+<h5 id="asset-path--"># Asset Path 플러그인 적용</h5>
+
+<p>글마다 그림 등 데이터를 별도의 리소스 디렉토리가 있는 것이 관리하기 좋을 것 같아
+이를 위한 플러그인 <a href="https://github.com/samrayner/jekyll-asset-path-plugin">Jekyll Asset Path</a>
+를 설치했다.
+Polyglot 룰에 맞추고 애셋 디렉토리명을 글의 파일 이름과 맞추는 수정사항을 추가로 구현했다.</p>
+
+<h5 id="section-3"># 기존 블로그 데이터 임포트</h5>
+
+<p>기존 블로그에 있는 글들을 임포트해왔다. 기존의 블로그는 HTML 형태로 받아올 수 있었는데
+이를 <a href="https://www.pandadoc.com/">Pandadoc</a> 을 사용해 일차적으로 markdown 포맷으로 변환하고
+이상하게 변환된  마크업들을 처리했다. 여기에 더해 글에 포함된 이미지 링크를 Asset 경로로 변경하고
+수식을 kramdown <a href="http://kramdown.gettalong.org/math_engine/mathjax.html">문법</a>에 맞춰 정리했다.
+다행히 (!) 기존에 작성한 글이 많지 않아 이 과정이 오래걸리지는 않았다.</p>
+
+<h5 id="publish--"># Publish 스크립트 만들기</h5>
+
+<p>Github 저장소에 브랜치 2개를 만들었다.</p>
+
+<ul>
+  <li>site 브랜치: 블로그 원본이 담긴 working branch.</li>
+  <li>master 브랜치: site 브랜치의 내용을 jenkyll 빌드하면 나오는 블로그 결과 페이지.</li>
+</ul>
+
+<p>Publish 스크립트는 site 브랜치에서 jekyll 을 통해 build 를 하면 그 결과를
+master 브랜치에 업데이트 하는 식으로 동작한다. 다른 사람들이 만들어 놓은 스크립트가
+잘 동작하지 않아 간단한 <a href="https://github.com/veblush/veblush.github.io/blob/site/publish.cmd">배치 파일</a>을
+통해 적당히 자동화 하였다.</p>
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/ko/posts/how-build-blog-using-jekyll/"
+       data-text="Jekyll 로 어떻게 블로그를 만들었나" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "ko";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/ko/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>
