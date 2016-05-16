@@ -6,9 +6,149 @@
     <description>blog for veblush, programmer</description>
     <link>http://veblush.github.io/</link>
     <atom:link href="http://veblush.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 16 May 2016 08:54:03 +0900</pubDate>
-    <lastBuildDate>Mon, 16 May 2016 08:54:03 +0900</lastBuildDate>
+    <pubDate>Mon, 16 May 2016 14:26:09 +0900</pubDate>
+    <lastBuildDate>Mon, 16 May 2016 14:26:09 +0900</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
+    
+      <item>
+        <title>Online game server on Akka.NET</title>
+        <description>&lt;p&gt;I made a speech about “Online game server on Akka.NET” at &lt;a href=&quot;https://ndc.nexon.com&quot;&gt;NDC&lt;/a&gt; 2016.
+Following are slides and Q&amp;amp;As in the session.&lt;/p&gt;
+
+&lt;h2 id=&quot;slides&quot;&gt;Slides&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.slideshare.net/veblush/online-game-server-on-akkanet-ndc2016&quot;&gt;Slideshare&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/assets/posts/2016-05-16-online-game-server-on-akkanet/NDC2016_OnlineGameServer_With_AkkaNet_English.pptx&quot;&gt;PPT&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;qa&quot;&gt;Q&amp;amp;A&lt;/h2&gt;
+
+&lt;h4 id=&quot;basic&quot;&gt;Basic&lt;/h4&gt;
+
+&lt;h6 id=&quot;should-i-concern-about-multi-thread-synchronization-and-thread-blocking-on-akkanet&quot;&gt;# Should I concern about multi-thread synchronization and thread-blocking on Akka.NET?&lt;/h6&gt;
+
+&lt;p&gt;Basically, No.
+Actor model which akka provides is the another way to write concurrent code
+without complex issues such as multi-threading and thread-blocking.&lt;/p&gt;
+
+&lt;h6 id=&quot;is-message-passing-only-method-for-accessing-the-state-of-actor-any-latency-or-io-overhead-related-with&quot;&gt;# Is message passing only method for accessing the state of actor? Any latency or IO overhead related with?&lt;/h6&gt;
+
+&lt;p&gt;Yes. Message passing only and it adds more latency and IO overhead but it’s well-optimized and good to go.&lt;/p&gt;
+
+&lt;h6 id=&quot;what-does-happen-to-child-actors-when-their-parent-actor-stops-is-it-could-be-spof&quot;&gt;# What does happen to child actors when their parent actor stops? Is it could be SPOF?&lt;/h6&gt;
+
+&lt;p&gt;Child actors will stop when their parent actor stops.
+SPOF could be handled with high level tools such as akka.cluster not with actor itself.&lt;/p&gt;
+
+&lt;h6 id=&quot;any-performance-problem-when-there-are-lots-of-messages-in-one-actor-mailbox&quot;&gt;# Any performance problem when there are lots of messages in one actor mailbox.&lt;/h6&gt;
+
+&lt;p&gt;One actor processes one message at a time. So that actor will be busy in processing all messages
+and take more time to response requests. But it doesn’t affect other actors because they are isolated from each others.&lt;/p&gt;
+
+&lt;h6 id=&quot;how-can-i-synchronize-data-when-one-actor-is-shared-from-several-nodes-in-a-cluster-any-lock-is-required&quot;&gt;# How can I synchronize data when one actor is shared from several nodes in a cluster. Any lock is required?&lt;/h6&gt;
+
+&lt;p&gt;Actor is only accessable via ActorRef so nodes cannot access data of actor just can send a message to it.
+When several messages received from nodes, the actor will process a message at a time so no lock is required to synchronize requests.&lt;/p&gt;
+
+&lt;h6 id=&quot;is-there-a-way-to-broadcast-a-message-to-many-actors-on-akkanet&quot;&gt;# Is there a way to broadcast a message to many actors on Akka.NET?&lt;/h6&gt;
+
+&lt;p&gt;Yes. There are two ways for that. First one is using wildcard included 
+&lt;a href=&quot;http://getakka.net/docs/Working%20with%20actors#identifying-actors-via-actor-selection&quot;&gt;ActorSelection&lt;/a&gt; and 
+second one is using 
+&lt;a href=&quot;http://getakka.net/docs/working-with-actors/Routers#broadcast&quot;&gt;Broadcast Router&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;programming-pattern&quot;&gt;Programming Pattern&lt;/h4&gt;
+
+&lt;h6 id=&quot;deadlock-may-occur-when-two-actors-send-a-message-to-each-other-and-await-how-can-we-handle-it&quot;&gt;# Deadlock may occur when two actors send a message to each other and await. How can we handle it?&lt;/h6&gt;
+
+&lt;p&gt;Yes it can cause deadlock. Because of this problem, send and await pattern is &lt;a href=&quot;http://bartoszsypytkowski.com/dont-ask-tell-2/&quot;&gt;not recommended&lt;/a&gt;.
+But if you want, there are three workarounds.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Like a lock-use scenario, you can set await hierarchies for actors.
+For more info about lock hierarchy, read &lt;a href=&quot;http://www.drdobbs.com/parallel/use-lock-hierarchies-to-avoid-deadlock/204801163&quot;&gt;Use Lock Hierarchies to Avoid Deadlock&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;ReentrantAttribute in Akka.Interfaced allows an actor to handle other messages while waiting await response.
+This can makes you avoid deadlock but you need to take care of reentrancy in await state.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h6 id=&quot;mmorpg-can-be-implemented-with-the-actor-model-there-could-be-many-interactions-between-actors-in-mmorpg-and-it-seems-hard-to-build-it&quot;&gt;# MMORPG can be implemented with the actor model? There could be many interactions between actors in MMORPG and it seems hard to build it.&lt;/h6&gt;
+
+&lt;p&gt;If actors depend on each others’ state and need lots of synchronized interactions, it will be hard to build a system with actors. 
+Therefore we need a system to make this easy. In case of TicTacToe, there is a GameActor for handling this problem.
+This GameActor receives all game commands from users in a game and processes it easily. (It’s like a single-threaded programming.)
+If a MMORPG whose world is separate into several isolated zones, you can use same approch for each zones.
+But for a MMORPG whose world is not separate such as a seemless world, it will be a challengeing work.&lt;/p&gt;
+
+&lt;h6 id=&quot;transaction-for-multiple-actors-for-examples-trade-between-two-users-requires-transaction-to-implement-it&quot;&gt;# Transaction for multiple actors? For examples, trade between two users requires transaction to implement it.&lt;/h6&gt;
+
+&lt;p&gt;If we can sqeeze multiple entities into one actor like zone actor, it will be solve easily.
+But an user inventory doesn’t seem to work like this. In this case, regular distributed transation will be an answer.
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Two-phase_commit_protocol&quot;&gt;Two-Phase commit protocol&lt;/a&gt; is a common solution and
+you can check 
+&lt;a href=&quot;http://www.slideshare.net/petabridge/distributed-transactions-in-akkanet&quot;&gt;How do I do transactions across a distributed system?&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h6 id=&quot;any-race-condition-for-trackabledata-set&quot;&gt;# Any race condition for TrackableData Set?&lt;/h6&gt;
+
+&lt;p&gt;No. TrackableData is not for concurrent data modification.
+It just tracks the changes of data and propages changes to other systems such as DB and client.
+There is no race condition because an actor owns trackabledata instances and processes a message at a time.&lt;/p&gt;
+
+&lt;h4 id=&quot;integeration&quot;&gt;Integeration&lt;/h4&gt;
+
+&lt;h6 id=&quot;languages-other-than-c-can-interoperate-with-akkanet&quot;&gt;# Languages other than C# can interoperate with Akka.NET?&lt;/h6&gt;
+
+&lt;p&gt;Yes. Any languages supporting .NET such as C#, F# and VB.NET can interoperate with Akka.NET.
+However, it’s not easy now for the environment beyond .NET.&lt;/p&gt;
+
+&lt;h6 id=&quot;it-it-easy-or-hard-to-write-test-code-on-akkanet&quot;&gt;# It it easy or hard to write test code on Akka.NET?&lt;/h6&gt;
+
+&lt;p&gt;Fundamentally it is harder than writing test code consisting of calling synchronized methods
+because the environment with multiple actors sending messages to each others is not deterministic.
+But Akka.NET provides handy tools helping for writing unit tests.
+Check out &lt;a href=&quot;https://petabridge.com/blog/how-to-unit-test-akkadotnet-actors-akka-testkit/&quot;&gt;How to Unit Test Akka.NET Actors with Akka.TestKit&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h6 id=&quot;can-akkanet-interop-with-akka-on-jvm&quot;&gt;# Can Akka.NET interop with Akka on JVM?&lt;/h6&gt;
+
+&lt;p&gt;Unfortunately, No. Check this &lt;a href=&quot;https://github.com/akkadotnet/akka.net/issues/1629&quot;&gt;Issue&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;performance&quot;&gt;Performance&lt;/h4&gt;
+
+&lt;h6 id=&quot;it-seems-to-have-performance-issues-do-you-have-stress-tests&quot;&gt;# It seems to have performance issues. Do you have stress tests?&lt;/h6&gt;
+
+&lt;p&gt;Still I don’t have any benchmark on whole system but I did tests on components and results looked good.
+From the Akka.NET manual, 50 million msg/sec on a single machine and ~2.5 million actors per GB of heap.&lt;/p&gt;
+
+&lt;h6 id=&quot;latency-could-be-problematic-when-hundreds-of-servers-send-messages-on-network&quot;&gt;# Latency could be problematic when hundreds of servers send messages on network?&lt;/h6&gt;
+
+&lt;p&gt;When an actor send a message to other actor in same machine,
+it doens’t use network just put a message in a recipient’s mailbox.
+So you need to put actors interacting with each others alot in same machine to avoid network stress.&lt;/p&gt;
+
+&lt;h4 id=&quot;etc&quot;&gt;Etc&lt;/h4&gt;
+
+&lt;h6 id=&quot;you-said-that-monstersweeperz-uses-c-iocp-but-there-is-no-iocp-api-on-net-how-did-you-do&quot;&gt;# You said that MonsterSweeperz uses C# IOCP but there is no IOCP API on .NET how did you do?&lt;/h6&gt;
+
+&lt;p&gt;Yes, there is no IOCP API on .NET and I didn’t make a lib for that.
+MonsterSweeperz uses .NET socket which is implemented on IOCP so I said like that.&lt;/p&gt;
+
+&lt;h6 id=&quot;any-problem-with-full-gc-latency-if-not-could-you-tell-me-the-maximum-size-of-heap&quot;&gt;# Any problem with full GC latency? If not, could you tell me the maximum size of heap?&lt;/h6&gt;
+
+&lt;p&gt;MonsterSweeperz has not suffered any GC problems because basic memory optimization already has been done
+and quick responsiveness was not a requirement of system. The maximum size of heap was about 1-2 GB.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 16 May 2016 00:00:00 +0900</pubDate>
+        <link>http://veblush.github.io/posts/online-game-server-on-akkanet/</link>
+        <guid isPermaLink="true">http://veblush.github.io/posts/online-game-server-on-akkanet/</guid>
+        
+        
+        <category>akkanet</category>
+        
+      </item>
     
       <item>
         <title>How I build my blog using Jekyll</title>
@@ -261,20 +401,6 @@ english and korean at the same time.&lt;/p&gt;
         <pubDate>Wed, 31 Oct 2012 00:00:00 +0900</pubDate>
         <link>http://veblush.github.io/posts/vcs-migration-strategy/</link>
         <guid isPermaLink="true">http://veblush.github.io/posts/vcs-migration-strategy/</guid>
-        
-        
-        <category>vcs</category>
-        
-      </item>
-    
-      <item>
-        <title>Repository management guideline for version control system</title>
-        <description>&lt;p&gt;&lt;em&gt;Oops sorry! English post is not available.&lt;/em&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Fri, 26 Oct 2012 00:00:00 +0900</pubDate>
-        <link>http://veblush.github.io/posts/vcs-management-guideline/</link>
-        <guid isPermaLink="true">http://veblush.github.io/posts/vcs-management-guideline/</guid>
         
         
         <category>vcs</category>

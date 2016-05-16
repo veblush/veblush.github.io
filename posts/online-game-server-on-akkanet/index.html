@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>Online game server on Akka.NET</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="en"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/online-game-server-on-akkanet/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/online-game-server-on-akkanet/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/">
+              Posts
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/about/">
+              About
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /posts/online-game-server-on-akkanet/ ">en</a>
+          
+            <a  class="top-about-link" href=" /ko/posts/online-game-server-on-akkanet/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">Online game server on Akka.NET</h2>
+  <p class="meta">2016-05-16</p>
+
+  <div class="content">
+  <p>I made a speech about “Online game server on Akka.NET” at <a href="https://ndc.nexon.com">NDC</a> 2016.
+Following are slides and Q&amp;As in the session.</p>
+
+<h2 id="slides">Slides</h2>
+
+<ul>
+  <li><a href="http://www.slideshare.net/veblush/online-game-server-on-akkanet-ndc2016">Slideshare</a></li>
+  <li><a href="/assets/posts/2016-05-16-online-game-server-on-akkanet/NDC2016_OnlineGameServer_With_AkkaNet_English.pptx">PPT</a></li>
+</ul>
+
+<h2 id="qa">Q&amp;A</h2>
+
+<h4 id="basic">Basic</h4>
+
+<h6 id="should-i-concern-about-multi-thread-synchronization-and-thread-blocking-on-akkanet"># Should I concern about multi-thread synchronization and thread-blocking on Akka.NET?</h6>
+
+<p>Basically, No.
+Actor model which akka provides is the another way to write concurrent code
+without complex issues such as multi-threading and thread-blocking.</p>
+
+<h6 id="is-message-passing-only-method-for-accessing-the-state-of-actor-any-latency-or-io-overhead-related-with"># Is message passing only method for accessing the state of actor? Any latency or IO overhead related with?</h6>
+
+<p>Yes. Message passing only and it adds more latency and IO overhead but it’s well-optimized and good to go.</p>
+
+<h6 id="what-does-happen-to-child-actors-when-their-parent-actor-stops-is-it-could-be-spof"># What does happen to child actors when their parent actor stops? Is it could be SPOF?</h6>
+
+<p>Child actors will stop when their parent actor stops.
+SPOF could be handled with high level tools such as akka.cluster not with actor itself.</p>
+
+<h6 id="any-performance-problem-when-there-are-lots-of-messages-in-one-actor-mailbox"># Any performance problem when there are lots of messages in one actor mailbox.</h6>
+
+<p>One actor processes one message at a time. So that actor will be busy in processing all messages
+and take more time to response requests. But it doesn’t affect other actors because they are isolated from each others.</p>
+
+<h6 id="how-can-i-synchronize-data-when-one-actor-is-shared-from-several-nodes-in-a-cluster-any-lock-is-required"># How can I synchronize data when one actor is shared from several nodes in a cluster. Any lock is required?</h6>
+
+<p>Actor is only accessable via ActorRef so nodes cannot access data of actor just can send a message to it.
+When several messages received from nodes, the actor will process a message at a time so no lock is required to synchronize requests.</p>
+
+<h6 id="is-there-a-way-to-broadcast-a-message-to-many-actors-on-akkanet"># Is there a way to broadcast a message to many actors on Akka.NET?</h6>
+
+<p>Yes. There are two ways for that. First one is using wildcard included 
+<a href="http://getakka.net/docs/Working%20with%20actors#identifying-actors-via-actor-selection">ActorSelection</a> and 
+second one is using 
+<a href="http://getakka.net/docs/working-with-actors/Routers#broadcast">Broadcast Router</a>.</p>
+
+<h4 id="programming-pattern">Programming Pattern</h4>
+
+<h6 id="deadlock-may-occur-when-two-actors-send-a-message-to-each-other-and-await-how-can-we-handle-it"># Deadlock may occur when two actors send a message to each other and await. How can we handle it?</h6>
+
+<p>Yes it can cause deadlock. Because of this problem, send and await pattern is <a href="http://bartoszsypytkowski.com/dont-ask-tell-2/">not recommended</a>.
+But if you want, there are three workarounds.</p>
+
+<ul>
+  <li>
+    <p>Like a lock-use scenario, you can set await hierarchies for actors.
+For more info about lock hierarchy, read <a href="http://www.drdobbs.com/parallel/use-lock-hierarchies-to-avoid-deadlock/204801163">Use Lock Hierarchies to Avoid Deadlock</a>.</p>
+  </li>
+  <li>
+    <p>ReentrantAttribute in Akka.Interfaced allows an actor to handle other messages while waiting await response.
+This can makes you avoid deadlock but you need to take care of reentrancy in await state.</p>
+  </li>
+</ul>
+
+<h6 id="mmorpg-can-be-implemented-with-the-actor-model-there-could-be-many-interactions-between-actors-in-mmorpg-and-it-seems-hard-to-build-it"># MMORPG can be implemented with the actor model? There could be many interactions between actors in MMORPG and it seems hard to build it.</h6>
+
+<p>If actors depend on each others’ state and need lots of synchronized interactions, it will be hard to build a system with actors. 
+Therefore we need a system to make this easy. In case of TicTacToe, there is a GameActor for handling this problem.
+This GameActor receives all game commands from users in a game and processes it easily. (It’s like a single-threaded programming.)
+If a MMORPG whose world is separate into several isolated zones, you can use same approch for each zones.
+But for a MMORPG whose world is not separate such as a seemless world, it will be a challengeing work.</p>
+
+<h6 id="transaction-for-multiple-actors-for-examples-trade-between-two-users-requires-transaction-to-implement-it"># Transaction for multiple actors? For examples, trade between two users requires transaction to implement it.</h6>
+
+<p>If we can sqeeze multiple entities into one actor like zone actor, it will be solve easily.
+But an user inventory doesn’t seem to work like this. In this case, regular distributed transation will be an answer.
+<a href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol">Two-Phase commit protocol</a> is a common solution and
+you can check 
+<a href="http://www.slideshare.net/petabridge/distributed-transactions-in-akkanet">How do I do transactions across a distributed system?</a>.</p>
+
+<h6 id="any-race-condition-for-trackabledata-set"># Any race condition for TrackableData Set?</h6>
+
+<p>No. TrackableData is not for concurrent data modification.
+It just tracks the changes of data and propages changes to other systems such as DB and client.
+There is no race condition because an actor owns trackabledata instances and processes a message at a time.</p>
+
+<h4 id="integeration">Integeration</h4>
+
+<h6 id="languages-other-than-c-can-interoperate-with-akkanet"># Languages other than C# can interoperate with Akka.NET?</h6>
+
+<p>Yes. Any languages supporting .NET such as C#, F# and VB.NET can interoperate with Akka.NET.
+However, it’s not easy now for the environment beyond .NET.</p>
+
+<h6 id="it-it-easy-or-hard-to-write-test-code-on-akkanet"># It it easy or hard to write test code on Akka.NET?</h6>
+
+<p>Fundamentally it is harder than writing test code consisting of calling synchronized methods
+because the environment with multiple actors sending messages to each others is not deterministic.
+But Akka.NET provides handy tools helping for writing unit tests.
+Check out <a href="https://petabridge.com/blog/how-to-unit-test-akkadotnet-actors-akka-testkit/">How to Unit Test Akka.NET Actors with Akka.TestKit</a>.</p>
+
+<h6 id="can-akkanet-interop-with-akka-on-jvm"># Can Akka.NET interop with Akka on JVM?</h6>
+
+<p>Unfortunately, No. Check this <a href="https://github.com/akkadotnet/akka.net/issues/1629">Issue</a>.</p>
+
+<h4 id="performance">Performance</h4>
+
+<h6 id="it-seems-to-have-performance-issues-do-you-have-stress-tests"># It seems to have performance issues. Do you have stress tests?</h6>
+
+<p>Still I don’t have any benchmark on whole system but I did tests on components and results looked good.
+From the Akka.NET manual, 50 million msg/sec on a single machine and ~2.5 million actors per GB of heap.</p>
+
+<h6 id="latency-could-be-problematic-when-hundreds-of-servers-send-messages-on-network"># Latency could be problematic when hundreds of servers send messages on network?</h6>
+
+<p>When an actor send a message to other actor in same machine,
+it doens’t use network just put a message in a recipient’s mailbox.
+So you need to put actors interacting with each others alot in same machine to avoid network stress.</p>
+
+<h4 id="etc">Etc</h4>
+
+<h6 id="you-said-that-monstersweeperz-uses-c-iocp-but-there-is-no-iocp-api-on-net-how-did-you-do"># You said that MonsterSweeperz uses C# IOCP but there is no IOCP API on .NET how did you do?</h6>
+
+<p>Yes, there is no IOCP API on .NET and I didn’t make a lib for that.
+MonsterSweeperz uses .NET socket which is implemented on IOCP so I said like that.</p>
+
+<h6 id="any-problem-with-full-gc-latency-if-not-could-you-tell-me-the-maximum-size-of-heap"># Any problem with full GC latency? If not, could you tell me the maximum size of heap?</h6>
+
+<p>MonsterSweeperz has not suffered any GC problems because basic memory optimization already has been done
+and quick responsiveness was not a requirement of system. The maximum size of heap was about 1-2 GB.</p>
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/posts/online-game-server-on-akkanet/"
+       data-text="Online game server on Akka.NET" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "en";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>Akka.NET 으로 만드는 온라인 게임 서버</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="ko"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/online-game-server-on-akkanet/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/online-game-server-on-akkanet/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/ko/">
+              글
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/ko/about/">
+              소개
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a  class="top-about-link" href=" /posts/online-game-server-on-akkanet/ ">en</a>
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /ko/posts/online-game-server-on-akkanet/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">Akka.NET 으로 만드는 온라인 게임 서버</h2>
+  <p class="meta">2016-05-16</p>
+
+  <div class="content">
+  <p>지난 <a href="https://ndc.nexon.com">NDC</a> 2016 에서 발표했던 “Akka.NET 으로 만드는 온라인 게임 서버” 의 발표 슬라이드와
+발표 때 있었던 질답을 여기에 정리해 둡니다.</p>
+
+<h2 id="section">발표자료</h2>
+
+<ul>
+  <li><a href="http://www.slideshare.net/veblush/akkanet-ndc2016">Slideshare</a></li>
+  <li><a href="/assets/posts/2016-05-16-online-game-server-on-akkanet/NDC2016_OnlineGameServer_With_AkkaNet.pptx">PPT</a></li>
+</ul>
+
+<h2 id="qa">Q&amp;A</h2>
+
+<h4 id="section-1">기본 사용</h4>
+
+<h6 id="section-2"># 아카닷넷에서 멀티스레드 동기화와 스레드 블락킹 이슈를 신경써야만 하는지 궁금합니다.</h6>
+
+<p>기본적으로는 아닙니다. Actor Model 은 멀티스레드 동기화와 스레드 블로킹 이슈와 같은 사용하기 어려운 개념 없이
+많은 액터가 각자의 메시지를 동시에 처리할 수 있도록 해주는 모델입니다.</p>
+
+<h6 id="io---"># 아카닷넷에서 기타 액터 상태 액세스는 메시지 파싱으로만 되나요? 그렇다면 레이턴시와IO의 오버헤드를 겪지 않으셨나요?</h6>
+
+<p>네 메시지 패싱으로만 됩니다. 레이턴시와 IO 오버헤드가 있지만 잘 최적화 되어 사용할 수 있었습니다.</p>
+
+<h6 id="spof--"># 부모 액터가 죽으면 자식 액터들은 어떻게 반응 하게 되나요? SPOF가 되진 않나요?</h6>
+
+<p>부모 액터가 죽으면 해당 부모의 모든 자식 액터는 소멸됩니다.
+액터 수준에서는 SPOF 를 해결하기 어려우며 보통은 Cluster 과 같은 상위 도구를 사용해서 해결합니다.</p>
+
+<h6 id="section-3"># 한 액터의 메시지 큐에 메시지가 많이 쌓일 경우 이게 액터의 퍼포먼스에도 영향을 주나요?</h6>
+
+<p>액터의 메시지 큐의 경우 단순한 큐라 쌓인 만큼 메모리를 소모하며 해당 액터는 동시에 하나의 메시지만
+처리 가능하기 때문에 해당 액터의 반응성이 떨어질 수 있습니다. 다만 다른 액터의 성능에는 영향을 주지 않습니다.</p>
+
+<h6 id="actor---------lock-"># 같은 actor를 여러 클러스터에서 참조할 경우 데이터 동기화는 어떻게 하는지 궁금합니다.별도로 lock을 하나요?</h6>
+
+<p>Actor 는 ActorRef 를 통해 메시지를 보낼 뿐이므로 여러 노드에서 같은 Actor 를 참조하더라도 데이터를 직접 변경할 수 없습니다.
+여러 노드에서 하나의 Actor 로 ActorRef 를 통해 메시지를 보내면 해당 Actor 는 순차적으로 메시지를 처리하기 때문에
+lock 이 필요하지 않습니다.</p>
+
+<h6 id="broadcast--"># 아카에서 한 액터가 여러 액터에 같은 메시지를 동시에 뿌릴 수 있는(broadcast)같은 기능이 있나요?</h6>
+
+<p>네 있습니다.
+와일드카드가 포함된 <a href="http://getakka.net/docs/Working%20with%20actors#identifying-actors-via-actor-selection">ActorSelection</a> 을 사용하거나
+<a href="http://getakka.net/docs/working-with-actors/Routers#broadcast">Broadcast Router</a> 를 사용할 수 있습니다.</p>
+
+<h4 id="section-4">프로그래밍 패턴</h4>
+
+<h6 id="await---------"># 액터들끼리 서로 메세지를 보내고 응답을 await하고 있으면 데드락이 발생할 수 있을 것 같은데, 어떻게 대응하면 좋을까요?</h6>
+
+<p>두 액터가 서로에게 메시지를 보내고 await 상태에 들어가면 데드락이 발생할 수 있습니다. 일반적으로 Akka 에서는 여러 액터가 서로
+메시지를 보내도 응답을 기다리는 패턴을 <a href="http://bartoszsypytkowski.com/dont-ask-tell-2/">권장하지 않고</a> 있습니다.
+하지만 필요하다면 다음과 같은 우회 방법이 있습니다.</p>
+
+<ul>
+  <li>
+    <p>일반적인 여러 객체가 Lock 을 거는 시나리오와 유사하게 Actor 간 await 계층을 두는 방법으로 우회할 수 있습니다.
+락 계층에 대해서는 <a href="http://www.drdobbs.com/parallel/use-lock-hierarchies-to-avoid-deadlock/204801163">Use Lock Hierarchies to Avoid Deadlock</a> 을 참고하세요.</p>
+  </li>
+  <li>
+    <p>Akka.Interfaced 의 ReentrantAttribute 를 사용하면 해당 메소드가 await 상태가 들어가더라도 다른 메시지를 핸들링 할 수 있습니다.
+이런 경우 데드락을 피할 수 있으나 해당 async 핸들러가 처리 중에 다른 메시지가 처리될 수 있음을 가정하고 작성해야 하는 수고가 생깁니다.</p>
+  </li>
+</ul>
+
+<h6 id="mmorpg----mmorpg--------------"># 액터 모델로 MMORPG도 만들 수 있을까요? MMORPG는 여러 액터들이 상호작용하는 경우가 많은데 유저 하나하나를 액터로 만들면 상호작용을 만들기 어려울 것 같아서요.</h6>
+
+<p>액터간 상호작용이 동기적이고 상태 의존이 많다면 액터의 매시지 패싱만으로는 로직을 구현하기 어렵습니다.
+따라서 이를 좀 더 단순하게 만드는 장치가 필요한데 TicTacToe 의 경우에는 이러한 역할을 하는 것이 GameActor 입니다.
+모든 유저의 요청은 모두 GameActor 의 하나의 액터가 처리하기 되어 있으며 이런 경우 모든 상태 변경이 싱글 스레드로
+처리할 수 있어 크게 어렵지 않게 로직을 담을 수 있습니다. World 가 서로 분리된 Zone 으로 구성된 MMORPG 의
+경우에도 유사한 접근을 사용할 수 있을 것 같습니다. 하지만 Zone 으로 구분되지 않은 완전히 열린 월드를
+액터를 통해 구축하는 것은 도전적인 과제로 보입니다.</p>
+
+<h6 id="shared-state-actor-model-------------------------------------"># 실시간 게임에서는 shared state가 일반적인데 actor model 에서는 어떻게 풀 수 있을까요. 예를 들면, 두 플레이어(액터)각각 아이템의 집합을 가지고 있고 이를 특정 조건 하에서만 (다른 플레이어의 상태에 의존성이 있으며 두 액터의 조건이 동시 만족해야 하는 경우) 교환할 수 있는 트랜잭션 조건을 액터 모델에서는 어떻게 접근하면 좋을까요</h6>
+
+<p>만약 Zone state 와 같이 하나의 액터에 상태를 몰아 놓을 수 있다면 쉽게 transaction 을 처리할 수 있습니다.
+하지만 유저의 인벤토리와 같이 그렇게 처리하기 어려운 경우에는 보통의 분산 트랜잭션을 사용하는 것이 일반적입니다.
+<a href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol">Two-Phase commit protocol</a> 이 일반적이며
+<a href="http://www.slideshare.net/petabridge/distributed-transactions-in-akkanet">How do I do transactions across a distributed system?</a>
+를 참고하면 좋을 것 같습니다.</p>
+
+<h6 id="trackabledataset----------"># TrackableData에서 SET에 대해서는 공유 데이터에서 동시성 이슈가 있을 것 같은데 어떤식으로 처리하시나요?</h6>
+
+<p>TrackableData 는 하나의 데이터에 대해 동시에 여러곳에서의 변경을 처리하기 위한 것이 아닙니다.
+한 곳에서의 변경을 여러곳에 전파하기 위한 것입니다.
+따라서 보통 Actor 의 데이터 역할을 하며 (예를 들면 유저 Actor 가 유저 데이터를 변경하듯) Actor 의 메시지 처리가
+순차적으로 진행되기 때문에 동시성 문제를 겪지 않습니다.</p>
+
+<h4 id="section-5">연동</h4>
+
+<h6 id="c-------"># C#이 아닌 언어와의 연동에 대한 방법도 제시 가능한가요?</h6>
+
+<p>일반적인 .NET 언어 C#, F#, VB.NET 모두 사용할 수 있습니다.
+다만 .NET 을 벗어나는 언어는 아직 가능하지 않습니다.</p>
+
+<h6 id="section-6"># 아카로된 프로젝트의 테스트 코드를 짤 때 더 편하거나 어려운 점이 있나요?</h6>
+
+<p>액터의 매시지 패싱이 일반적인 함수 호출과 달리 덜 결정적이라 기본적으로 테스트 코드를 작성하기 어렵습니다.
+하지만 Akka.NET 은 이를 위한 테스트 헬퍼를 제공해 큰 어려움 없이 테스트 코드를 작성할 수 있습니다.
+좀 더 자세한 내용은 <a href="https://petabridge.com/blog/how-to-unit-test-akkadotnet-actors-akka-testkit/">How to Unit Test Akka.NET Actors with Akka.TestKit</a> 를
+참고하세요.</p>
+
+<h6 id="akka-akkarpc-"># 스칼라 akka와 닷넷 akka 와 rpc 바인딩이 되나요?</h6>
+
+<p>아쉽게도 현재 Akka.NET 은 JVM Akka 와 통신을 할 수 없습니다.
+<a href="https://github.com/akkadotnet/akka.net/issues/1629">참고</a>.</p>
+
+<h4 id="section-7">성능</h4>
+
+<h6 id="section-8"># 퍼포먼스 이슈가 제법 나올 것 같은데 부하테스트 등을 간단히 해보신 적이 있으신지요?</h6>
+
+<p>Akka 는 어느정도 최적화가 되어 있습니다.
+Akka.NET 문서에 따르면 대략 1대 물리 머신에서 초당 5천만 메시지를 처리할 수 있고
+1GB 당 2.5백만 액터를 메모리에 적재할 수 있습니다.</p>
+
+<h6 id="section-9"># 액터모델 성능 어떤가요? 서버 수백대 상황에서 대부분의 메시지가 네트워크 통해 전달되면 딜레이가 느껴지지 않을까요?</h6>
+
+<p>서버가 수백대인 상황에서는 일반적인 서버 프로그래밍과 같이 messaging locality 를 신경써야 합니다.
+원격 메시징 보다 로컬 메시징이 훨씬 싸기 때문에 상호작용이 많은 액터를 최대한 같은 물리 머신 내에 두는 전략이 필요합니다.</p>
+
+<h4 id="section-10">기타</h4>
+
+<h6 id="c-iocp-cnetiocp-api-----cnetiocp-api--"># 돌격전차 개발환경이 C# IOCP라고 하셨는데 C#.NET에서는 IOCP API가 제공되지 않는 것으로 알고있습니다. C#.NET에서 IOCP API를 어떻게 연결하셨나요?</h6>
+
+<p>.NET 의 기본 Socket 은 IOCP 로 구현되어 있어 IOCP 라고 한 것입니다. 직접 Windows Native IOCP API 를 사용하지는 않았습니다.</p>
+
+<h6 id="full-gc-----heap--"># Full GC레이턴시때문에 문제생긴적 있으세요? 없다면 혹시 실서비스 최대 Heap 사이즈 여쭤봐도 될까요?</h6>
+
+<p>Full GC 문제는 .NET 의 일반적인 문제이나 돌격전차는 해당 문제를 겪지 않았습니다.
+GC 부하를 줄이기 위해 빈번한 메모리 할당 해제를 줄여 두기도 했었고 게임 자체가 기만한 서버의 반응을
+요구하는 게임이 아니었기 때문입니다.
+최대 Heap 크기는 정확하게 기억하지 않으나 1~2GB 안팎이이었던 것 같습니다.</p>
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/ko/posts/online-game-server-on-akkanet/"
+       data-text="Akka.NET 으로 만드는 온라인 게임 서버" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "ko";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/ko/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>
