@@ -6,8 +6,8 @@
     <description>blog for veblush, programmer</description>
     <link>http://veblush.github.io/</link>
     <atom:link href="http://veblush.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 16 May 2016 14:26:09 +0900</pubDate>
-    <lastBuildDate>Mon, 16 May 2016 14:26:09 +0900</lastBuildDate>
+    <pubDate>Wed, 18 May 2016 08:39:15 +0900</pubDate>
+    <lastBuildDate>Wed, 18 May 2016 08:39:15 +0900</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
     
       <item>
@@ -82,7 +82,7 @@ This can makes you avoid deadlock but you need to take care of reentrancy in awa
 Therefore we need a system to make this easy. In case of TicTacToe, there is a GameActor for handling this problem.
 This GameActor receives all game commands from users in a game and processes it easily. (It’s like a single-threaded programming.)
 If a MMORPG whose world is separate into several isolated zones, you can use same approch for each zones.
-But for a MMORPG whose world is not separate such as a seemless world, it will be a challengeing work.&lt;/p&gt;
+But for a MMORPG whose world is not separate such as a seemless world, it will be a challenging work.&lt;/p&gt;
 
 &lt;h6 id=&quot;transaction-for-multiple-actors-for-examples-trade-between-two-users-requires-transaction-to-implement-it&quot;&gt;# Transaction for multiple actors? For examples, trade between two users requires transaction to implement it.&lt;/h6&gt;
 
@@ -98,7 +98,7 @@ you can check
 It just tracks the changes of data and propages changes to other systems such as DB and client.
 There is no race condition because an actor owns trackabledata instances and processes a message at a time.&lt;/p&gt;
 
-&lt;h4 id=&quot;integeration&quot;&gt;Integeration&lt;/h4&gt;
+&lt;h4 id=&quot;integration&quot;&gt;Integration&lt;/h4&gt;
 
 &lt;h6 id=&quot;languages-other-than-c-can-interoperate-with-akkanet&quot;&gt;# Languages other than C# can interoperate with Akka.NET?&lt;/h6&gt;
 
