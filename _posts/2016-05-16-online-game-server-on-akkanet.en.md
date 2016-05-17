@@ -69,7 +69,7 @@ If actors depend on each others' state and need lots of synchronized interaction
 Therefore we need a system to make this easy. In case of TicTacToe, there is a GameActor for handling this problem.
 This GameActor receives all game commands from users in a game and processes it easily. (It's like a single-threaded programming.)
 If a MMORPG whose world is separate into several isolated zones, you can use same approch for each zones.
-But for a MMORPG whose world is not separate such as a seemless world, it will be a challengeing work.
+But for a MMORPG whose world is not separate such as a seemless world, it will be a challenging work.
 
 ###### # Transaction for multiple actors? For examples, trade between two users requires transaction to implement it.
 
@@ -85,7 +85,7 @@ No. TrackableData is not for concurrent data modification.
 It just tracks the changes of data and propages changes to other systems such as DB and client.
 There is no race condition because an actor owns trackabledata instances and processes a message at a time.
 
-#### Integeration
+#### Integration
 
 ###### # Languages other than C# can interoperate with Akka.NET?
 
