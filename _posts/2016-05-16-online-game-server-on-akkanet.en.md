@@ -36,7 +36,7 @@ SPOF could be handled with high level tools such as akka.cluster not with actor 
 ###### # Any performance problem when there are lots of messages in one actor mailbox.
 
 One actor processes one message at a time. So that actor will be busy in processing all messages
-and take more time to response requests. But it doesn't affect other actors because they are isolated from each others. 
+and takes more time to respond requests. But it doesn't affect other actors because they are isolated from each others. 
 
 ###### # How can I synchronize data when one actor is shared from several nodes in a cluster. Any lock is required?
 
