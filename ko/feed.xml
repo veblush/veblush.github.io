@@ -6,9 +6,396 @@
     <description>blog for veblush, programmer</description>
     <link>http://veblush.github.io/ko/</link>
     <atom:link href="http://veblush.github.io/ko/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 21 May 2016 10:01:08 +0900</pubDate>
-    <lastBuildDate>Sat, 21 May 2016 10:01:08 +0900</lastBuildDate>
+    <pubDate>Fri, 15 Jul 2016 16:23:49 +0900</pubDate>
+    <lastBuildDate>Fri, 15 Jul 2016 16:23:49 +0900</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
+    
+      <item>
+        <title>Akka.NET 으로 만드는 온라인 게임 서버의 최근 2개월간 작업</title>
+        <description>&lt;p&gt;NDC 2016 에서 발표한 &lt;a href=&quot;http://veblush.github.io/ko/posts/online-game-server-on-akkanet/&quot;&gt;Akka.NET 으로 만드는 온라인 게임 서버&lt;/a&gt; 에
+관한 작업을 지난 2개월간 진행했다. 주로 과거 작업에서 거칠게 처리된 부분을 다듬고 기술 부채를 갚는데 초점을 맞췄다.
+이 글을 통해 수행한 작업을 설명하고 앞으로 진행 할 만한 남은 작업을 정리한다.&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;한 일&lt;/h3&gt;
+
+&lt;h4 id=&quot;interface&quot;&gt;표현력 있는 Interface&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced&quot;&gt;Akka.Interfaced&lt;/a&gt; 는 C# &lt;code class=&quot;highlighter-rouge&quot;&gt;interface&lt;/code&gt; 를 사용해 액터의 메시지를 기술한다.
+이는 C# 프로그래머에게는 자연스러운 개념이며 이를 통해 매끄럽게 액터와 메시지를 주고 받을 수 있다.
+하지만 &lt;code class=&quot;highlighter-rouge&quot;&gt;interface&lt;/code&gt; 를 사용하기 때문에 프로그래머는 일반적인 &lt;code class=&quot;highlighter-rouge&quot;&gt;interface&lt;/code&gt; 의 기능이 모두 사용 가능하리라 기대한다.
+떄문에 이를 만족시키기 위해 제네릭과 상속을 추가로 구현하였다.&lt;/p&gt;
+
+&lt;h6 id=&quot;section-1&quot;&gt;제네릭&lt;/h6&gt;
+
+&lt;p&gt;제네릭 인터페이스와 메소드를 지원하며 다음과 같은 형태의 인터페이스를 사용할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// generic interface
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IInterfacedActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Greet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// generic method
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetCount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;이렇게 정의된 제네릭 인터페이스와 메소드는 다음과 같이 클래스에서 구현할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GreetingActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterfacedActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Greet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Greet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;제네릭 인터페이스를 지원하는 작업은 상대적으로 간단했다. 왜냐하면 액터가 생성되는 시점에 generic 파라미터가 모두 결정되어 있기 때문이다.
+하지만 제네릭 메소드는 그렇지 않은데 메소드 실체가 제네릭 파라미터가 바뀔 때마다 새롭게 구축되어야 하기 때문이다.&lt;/p&gt;
+
+&lt;p&gt;관련 이슈: &lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/issues/30&quot;&gt;Generic interface #30&lt;/a&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;section-2&quot;&gt;상속&lt;/h6&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Interface&lt;/code&gt; 상속은 다음과 같이 사용할 수 있다. 구현도 간단히 가능했다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IInterfacedActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Greet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeterEx&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GreetEx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;관련 이슈: &lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/issues/27&quot;&gt;Support interface inheritance #27&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;api-&quot;&gt;API 다듬기&lt;/h4&gt;
+
+&lt;p&gt;Proof-Of-Concept 단계에서는 생각한 것이 제대로 잘 구현되는지 보기위해 API 를 다듬는 과정을 거의 하지 않았다.
+매끄러운 API 를 만드는 과정은 생각보다 시간이 많이 소요되며 경우에 따라서는 더 사용하기 좋은 API 가
+나오지 못하는 경우도 있기 때문이다. 이런 이유로 첫 작업때 진행하지 못한 다듬기 작업을 이번에 진행했다.&lt;/p&gt;
+
+&lt;h6 id=&quot;crtp-curiously-recurring-template-pattern-&quot;&gt;CRTP (Curiously Recurring Template Pattern) 제거&lt;/h6&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActor&lt;/code&gt; 는 매시지 디스패쳐 테이블을 클래스 타입별로 따로따로 구축해 저장해 두는데 저장할 장소가
+마땅치 않아 이를 CRTP 를 사용해 해결했었다. 제네릭 클래스는 해당 클래스가 구체화 될 때마다 static member 공간이
+할당되는데 이를 테이블을 저장 하는 용도로 사용했다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GreeterActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterfacedActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GreeterActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;이런 패턴에서 보통 하는 실수는 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActor&lt;/code&gt; 의 파라미터를 엉뚱하게 넣는 것인데 
+위의 경우 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActor&amp;lt;GuestActor&amp;gt;&lt;/code&gt; 와 같이 잘못 넣으면 넣으면 컴파일은 잘 되나 실행 중에 예외가 발생한다.
+이런 이슈는 안전한 작업 환경에 방해가 되기 때문에 아래와 같이 문제의 여지를 제거하는 방향으로 개선했다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GreeterActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterfacedActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;관련 이슈: &lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/issues/20&quot;&gt;Change InterfacedActor&amp;lt;T&amp;gt; to InterfacedActor #20&lt;/a&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;section-3&quot;&gt;처리되지 않은 예외 정책&lt;/h6&gt;
+
+&lt;p&gt;기존 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActor&lt;/code&gt; 는 요청 처리 중 처리되지 않은 예외가 발생하면 이를 잡아다가 요청한 곳으로 돌려 보냈다.
+이것은 Requester-Responder 가 Caller-Callee 관계와 1:1 대응 된다라는 관점에서 결정된 것이었다.
+문제는 Akka.NET 은 처리되지 않은 예외가 발생했을 때 &lt;a href=&quot;http://getakka.net/docs/Fault%20tolerance&quot;&gt;Fault Tolerance&lt;/a&gt; 의 일환으로
+부모 액터에게 처리를 위임한다는데 있다.
+InterfacedActor 가 예외를 처리할 때 Akka.NET 의 표준 방식과 다르게 동작하는 것은 프로그래머에게 불필요한 혼란을 만들기 좋다.
+떄문에 처리되지 않은 예외가 발생했을 때 기본적으로는 Akka.NET 방식을 따르도록 변경했다.
+다만 기존과 같이 요청자에게 예외를 넘기기 위해서는 다음과 같이 &lt;code class=&quot;highlighter-rouge&quot;&gt;ResponsiveException&lt;/code&gt; 을 사용하면 된다.
+이 경우에는 &lt;code class=&quot;highlighter-rouge&quot;&gt;ArgumentException&lt;/code&gt; 는 요청자에게 예외를 넘기고 그 외의 다른 예외는 Akka.NET 방식을 따르게 된다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;GreeterActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterfacedActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ResponsiveException&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ArgumentException&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IGreeter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Greet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;관련 이슈: &lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/issues/21&quot;&gt;Exception policy for handling request, notification and message. #21&lt;/a&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;observer-message-handler--request-handler----&quot;&gt;Observer, Message Handler 도 Request Handler 의 확장 기능 담기&lt;/h6&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActor&lt;/code&gt; 는 총 3가지 타입의 메시지를 처리할 수 있다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Request: &lt;code class=&quot;highlighter-rouge&quot;&gt;IInterfacedActor&lt;/code&gt; 로 정의된 인터페이스를 통한 요청 메시지&lt;/li&gt;
+  &lt;li&gt;Notification: &lt;code class=&quot;highlighter-rouge&quot;&gt;IInterfacedObserver&lt;/code&gt; 로 정의된 옵저거의 이벤트 통지 메시지&lt;/li&gt;
+  &lt;li&gt;Message: &lt;code class=&quot;highlighter-rouge&quot;&gt;[MessageHandler]&lt;/code&gt; 에 의해 핸들러가 정의된 메시지&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이 메시지 타입중 Request 는 기존에 필터와 확장 핸들러 기능을 사용할 수 있었다.
+프로그래머는 Notification 과 Message 의 핸들러도 Request 와 같이 해당 기능을 가질 것이라 기대할 것이므로 동일하게 기능을 추가해 주었다.&lt;/p&gt;
+
+&lt;p&gt;따라서 일반 메시지 핸들러에도 다음과 같이 &lt;code class=&quot;highlighter-rouge&quot;&gt;LogFilter&lt;/code&gt; 를 사용할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;TestActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterfacedActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MessageHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;OnMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;옵저버 이벤트 통지 메시지 처리도 확장 인터페이스를 사용할 수 있게 되었다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;TestActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterfacedActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IExtendedInterface&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ISubjectObserver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ExtendedHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eventName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;관련 이슈: &lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/issues/16&quot;&gt;Let observer handler work with ExtendedHandler and Filter like Interfaced handler. #16&lt;/a&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;slimclient-api&quot;&gt;매끄러운 SlimClient API&lt;/h6&gt;
+
+&lt;p&gt;SlimClient 은 Akka.NET 없이 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActorRef&lt;/code&gt; 에 접근할 수 있도록 만들어주는 라이브러리다. 
+Akka.NET 을 사용하지 않기 때문에 구현은 상당히 다르게 되어 있는데 이 때문에
+&lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActorRef&lt;/code&gt; 나 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedObserver&lt;/code&gt; 를 SlimClient 경계로 주고 받을 때 번역이 필요했었다.&lt;/p&gt;
+
+&lt;p&gt;예를 들면 다음은 UserLogin 액터의 Login 메소드인데 이 메소드는 SlimClient 에서 생성된
+Observer 를 받고 Akka.NET 에서 생성된 User 액터의 Ref 를 다시 클라이언트에게 넘겨준다.
+기존에는 다음과 같이 인터페이스 정의 때부터 정수형 ID 를 사용해야 했고 ID 를 받고 나면 직접 UserRef 를 구축했어야 했다.
+이는 투명항 API 사용 경험을 방해하며 꽤 번잡한 코드를 작성해야만 했다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUserLogin&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IInterfacedActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;observerId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userLogin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(...);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;UserRef&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SlimActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SlimRequestWaiter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_comm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;이를 다음과 같이 정리했다. Akka.NET 환경에서와 마찬가지로 SlimClient 에서도
+&lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActorRef&lt;/code&gt; 와 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedObserver&lt;/code&gt; 를 그대로 사용할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUserLogin&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IInterfacedActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IUser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IUserObserver&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;observer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userLogin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(...);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;관련 이슈: &lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/issues/23&quot;&gt;Concise way for retrieving InterfacedActorRef on slim-client. #23&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;slimclient--&quot;&gt;SlimClient 채널 확장&lt;/h4&gt;
+
+&lt;p&gt;기존의 단순한 TCP 단일 채널을 확장했다.&lt;/p&gt;
+
+&lt;h5 id=&quot;udp-&quot;&gt;UDP 지원&lt;/h5&gt;
+
+&lt;p&gt;기존 TCP 에 더해 UDP 채널을 추가했다. UDP 채널을 지원하게 된 이유는 다음과 같다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;HandOver: 모바일 환경에서 HandOver 를 TCP 로 구현하는데 추가 작업이 있다.
+제대로 된 HandOver 를 구현하기 위해서는 TCP 위에다가 다시 전송 레이어를 올려야 하는데
+이게 배보다 배꼽이 커지는 구현이다.
+그러느니 Reliable UDP 을 가져다 쓰면 되지 않을까?
+거기에 더해 TCP 는 HandOver 가 느리게 수행되는데 UDP 는 애초에 비접속 프로토콜이라 빠르게 수행될 수 있다.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;다양한 QoS 지원:
+TCP 는 Reliable &amp;amp; Ordered 만 지원하는데 반해 UDP 를 가지고는 Reliable &amp;amp; Unordered 혹은
+Unreliable 등을 추가로 지원할 수 있다.
+플레이어 움직임 패킷은 unreliable-sequenced 만으로도 충분하며 TCP 에 비해 더 좋은 성능을 보인다.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;쓸만한 Reliable UDP 를 찾다가 &lt;a href=&quot;https://github.com/lidgren/lidgren-network-gen3&quot;&gt;Lidgren Network Library&lt;/a&gt; 를 사용하기로 했다.
+서버에서 쓰기엔 성능이 살짝 아쉽지만 일단 사용에는 문제가 없고 특히 견고한 통신 라이브러리는 금방 만들 수 없으므로
+가져다가 아쉬운 부분은 고쳐 쓰기로 했다. 라이브러리를 &lt;a href=&quot;https://github.com/SaladLab/LidgrenUdpNet&quot;&gt;포크&lt;/a&gt;해 다음과 같은
+기능을 추가했다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;nuget package 에 .NET 3.5 지원: &lt;a href=&quot;https://www.nuget.org/packages/LidgrenUdpNet/&quot;&gt;LidgrenUdpNet&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;유니티 패키징 지원: &lt;a href=&quot;https://github.com/SaladLab/LidgrenUdpNet/releases&quot;&gt;LidgrenUdpNet for Unity3D&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;빠른 메시지 핸들링을 위한 기능 추가&lt;/li&gt;
+  &lt;li&gt;HandOver 를 위해 접속 EndPoint 가 아닌 Connection ID 로 커넥션 구분&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Lidgren Network Library 를 가져다 쓰게되어서 가지게 된 또 하나의 장점은 서버 없이 (혹은 서버도 함께)
+P2P 네트워크를 구축할 수 있다는 점이다. 당장 서버 프레임웍에서는 중요하지 않지만 여러모도 쓸모가 있는 기능이다.&lt;/p&gt;
+
+&lt;h5 id=&quot;section-4&quot;&gt;원격 채널 바인딩&lt;/h5&gt;
+
+&lt;p&gt;접속한 클라이언트를 다른 서버의 Actor 에 연결해주는데 사용한다.
+예전에는 클라이언트가 다른 서버의 Actor 를 접근할 때 처음에 접속한 채널을 통해 접근했었다. (아래 그림 Forwarding Channel)
+이 방법은 구성이 간결하고 클라이언트 작업이 단순한데 반해 원격 Actor 와의 트래픽이 많은 경우
+불필요한 포워딩 비용을 발생시킨다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   * Forwarding Channel                          * Direct Channel
+   Client -&amp;gt; Channel1 -&amp;gt; UserActor               Client -&amp;gt; Channel1 -&amp;gt; UserActor        
+                |                                   | 
+             ~~~|~~~~                               |      ~~~~~~~~
+                |                                   |
+                +---- -&amp;gt; GameActor                  +----&amp;gt; Channel2 -&amp;gt; GameActor
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;이를 해결하기 위해 클라이언트가 원격에 있는 Actor 가 있는 서버와 직접 채널을 만들어 통신하도록 할 수 있는
+방법을 추가했다. (위 그림 Direct Channel)&lt;/p&gt;
+
+&lt;p&gt;예를 들어 원격에 있는 GameActor 에 클라이언트가 직접 통신하도록 채널을 열기위한 코드는 다음과 같다.
+원격 Gateway 를 통해 채널과 액터를 연결하고 연결된 정보를 클라이언트에게 반환한다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IGamePlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;JoinGame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;game&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetGame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;game&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;...);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boundTarget&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_channel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;BindActorOrOpenChannel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;game&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;CastToIActorRef&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;TaggedType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IGamePlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ActorBindingFlags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;OpenThenNotification&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ActorBindingFlags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CloseThenNotification&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;GameGateway&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boundTarget&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Cast&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GamePlayerRef&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;클라이언트는 다음 코드와 같이 원격 Actor 의 &lt;code class=&quot;highlighter-rouge&quot;&gt;InterfacedActorRef&lt;/code&gt; 를 받고 나서 해당 Actor 를 접근하기 위해
+추가 채널 구성이 필요한지 확인 한 뒤에 필요하면 채널을 연결한 뒤에 일반적인 Actor 처럼 사용할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gamePlayer&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;JoinGame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gameId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;...);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamePlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;IsChannelConnected&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gamePlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ConnectChannelAsync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;gamePlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;CallSomething&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;actor---interface-&quot;&gt;채널에 바인딩 된 Actor 에 여러 Interface 허용&lt;/h5&gt;
+
+&lt;p&gt;예전에는 채널에 바인딩 된 Actor 에 대해 한 가지 종류의 인터페이스만 허용이 되었다. (액터가 구현할 수 있는 인터페이스가 한 개라는 의미가 아님)
+이를 복수개의 인터페이스를 동시에 바인딩 할 수 있도록 변경했다. 이를 통해 다음과 같은 케이스를 구현할 수 있다.&lt;/p&gt;
+
+&lt;p&gt;예를 들어 &lt;code class=&quot;highlighter-rouge&quot;&gt;UserActor&lt;/code&gt; 에 두 가지 권한 접근이 있다고 하자.
+일반 접근과, 관리자 접근이 있는데 관리자 인증이 되기 전까지는 일반 접근만을 허용하고 인증이 된 이후에는 두 접근이 모두 가능하도록 해보자.
+우선 &lt;code class=&quot;highlighter-rouge&quot;&gt;UserActor&lt;/code&gt; 에는 &lt;code class=&quot;highlighter-rouge&quot;&gt;IUser&lt;/code&gt; 와 &lt;code class=&quot;highlighter-rouge&quot;&gt;IUserForAdmin&lt;/code&gt; 의 권한으로 분리된 인터페이스를 만들고 첫 접근 때는 &lt;code class=&quot;highlighter-rouge&quot;&gt;IUser&lt;/code&gt; 만 채널에 바인딩한다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;UserActor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IInterfacedActor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUserForAdmin&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;NormalMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IUserForAdmin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;PowerMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;관리자임이 확인이 되면 다음고 같이 채널의 &lt;code class=&quot;highlighter-rouge&quot;&gt;BindType&lt;/code&gt; 을 사용해 &lt;code class=&quot;highlighter-rouge&quot;&gt;IUserForAdmin&lt;/code&gt; 타입을 바인드 한다.
+이 이후 부터는 클라이언트가 &lt;code class=&quot;highlighter-rouge&quot;&gt;IUserForAdmin &lt;/code&gt;의 메소드를 호출할 수 있게 된다.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Authorize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(...)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_channel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;BindType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TaggedType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;typeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IUserForAdmin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;section-5&quot;&gt;예제 작업&lt;/h4&gt;
+
+&lt;p&gt;예제를 만드는 과정은 전체 개발 과정에서 중요한 과정이었다. 개발 과정에서 예제는
+작성한 라이브러리가 잘 동작하는지 확인할 수 있는 첫번째 구체화된 어플리케이션이고
+어떤 기능을 구현할 때 얼마나 간결하게 표현할 수 있는지 혹은 어떤 기능이 부족하거나 없는지를
+즉시적으로 보여주기 때문이다. 또한 예제는 중요한 튜토리얼이 되며 개발자가 원하는
+best practice 를 효과적으로 보여주는 장치가 된다. 따라서 손이 많이 감에도 작업을 계속 신경쓰면서 진행했다.&lt;/p&gt;
+
+&lt;h5 id=&quot;section-6&quot;&gt;레퍼런스 어플리케이션 업데이트&lt;/h5&gt;
+
+&lt;p&gt;예전에 만들어 둔 3개의 레퍼런스 앱이 &lt;a href=&quot;https://github.com/SaladLab/Chatty&quot;&gt;Chatty&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/SaladLab/TicTacToe&quot;&gt;TicTacToe&lt;/a&gt;, &lt;a href=&quot;https://github.com/SaladLab/Snake&quot;&gt;Snake&lt;/a&gt;
+가 있는데 이를 모두 라이브러리 변경에 맞춰 업데이트했다. (마이그래이션에 생각보다 시간이 많이 들었다.)&lt;/p&gt;
+
+&lt;p&gt;3개는 서로 기능이 겹치는 부분도 있고 아닌 부분도 있는데 3개가 있다보니 공통된 부분을 쉽게 찾을 수 있다.
+이번 작업때는 클러스터 노드 관련 부분을 추려 &lt;a href=&quot;https://github.com/SaladLab/Aim.ClusterNode&quot;&gt;Aim.ClusterNode&lt;/a&gt; 를 만들었다.
+또한 모든 예제에 테스트 프로젝트를 추가하고 서버를 서비스 형태로 사용할 수 있도록 변경했다.&lt;/p&gt;
+
+&lt;h5 id=&quot;project-scaffolding&quot;&gt;Project Scaffolding&lt;/h5&gt;
+
+&lt;p&gt;이번에 새롭게 &lt;a href=&quot;https://github.com/SaladLab/Akka.ProjectScaffolding&quot;&gt;Akka.ProjectScaffolding&lt;/a&gt; 을 추가했다. 
+새 게임을 만들기 위해 프로젝트 환경을 구축할 하기 위해서는 여러개의 프로젝트를 만들고 라이브러리를 설치하고
+종속 관계를 만드는 과정 등을 진행해야 하는데 생각보다 절차가 많고 지루한 과정이라 만들게 되었다.
+처음에는 Visual Studio &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/ms185301.aspx&quot;&gt;Project Template&lt;/a&gt; 
+형태로 할까 하다가 Visual Studio Code 등 타 개발 환경에 대응하기 어렵고 템플릿 프로젝트를 계속 유지 보수하기 어려워 독립된 프로젝트로 구성했다.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/SaladLab/Akka.ProjectScaffolding/releases&quot;&gt;배포 페이지&lt;/a&gt;에서 프로그램을
+받아 다음과 같이 실행하면 기본 프로젝트를 구성해준다.
+다음와 같이 클러스터 구성이된 새 프로젝트를 만들 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;akka-unity-cluster NewProjectName
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;section-7&quot;&gt;테스트, 문서 작성&lt;/h4&gt;
+
+&lt;p&gt;빠른 개발로 빠진 테스트를 구현하고 문서를 작성했다. 테스트의 경우에는 테스트 하나를 만드는 것 보다는
+테스트가 가능하게 만드는 틀을 만드는 과정이 보통 어려웠다. 그리고 문서 작성은 언제나 어렵다. :)&lt;/p&gt;
+
+&lt;p&gt;추가된 테스트&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/tree/master/core/CodeGenerator.Tests&quot;&gt;Akka.Interfaced CodeGenerator&lt;/a&gt; :
+생성된 코드를 텍스트로 비교하지 않고 생성된 코드를 파싱하고 난 결과를 검사하는 식으로 테스트 assert 코드를 짧게 유지.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced.SlimSocket/tree/master/core/Akka.Interfaced.SlimSocket.Tests&quot;&gt;Akka.Interfaced.SlimSocket&lt;/a&gt; :
+기존에는 SlimClient 프로젝트와 Akka 가 상호 충돌하는 구조라 테스트 프로젝트 구성이 아예 불가능했는데 SlimClient 프로젝트를 제거하면서 가능하게 되어 테스트 구성.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;작성된 문서&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/SaladLab/Akka.Interfaced/blob/master/docs/Manual.md&quot;&gt;Akka.Interfaced Manual&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-8&quot;&gt;남은 일&lt;/h3&gt;
+
+&lt;p&gt;했으면 좋겠다 싶은 일들을 정리했다. 다만 언제 어떻게 진행할지는 아직 미정이다.
+머리속에서 컨텍스트가 날아가기 전에 정리하는 의미.&lt;/p&gt;
+
+&lt;h4 id=&quot;udp--&quot;&gt;UDP 통신 보안.&lt;/h4&gt;
+
+&lt;p&gt;UDP 에 암호화된 통신 보안 기능을 추가한다. UDP 의 경우 EndPoint 가 아닌 Connection ID 를 통해
+독립된 접속을 구성하는데 이 말은 누구라도 Connection ID 만 맞춰서 데이터를 끼워넣을 수 있다는 의미다.
+따라서 이를 방지하기 위해 암호화된 통신 기능을 추가해야 한다.
+비슷한 이유로 &lt;a href=&quot;https://en.wikipedia.org/wiki/QUIC&quot;&gt;QUIC&lt;/a&gt; 은 TLS/SSL 을 끌 수 없도록 되어 있다.&lt;/p&gt;
+
+&lt;h4 id=&quot;protobufnet--wire&quot;&gt;Protobuf.NET 대신 Wire&lt;/h4&gt;
+
+&lt;p&gt;SlimSocket 은 메시지 시리얼라이져로 &lt;a href=&quot;https://github.com/mgravell/protobuf-net&quot;&gt;protobuf-net&lt;/a&gt; 을 사용한다.
+떄문에 메시지에 상속과 제네릭을 사용할 수 없다.
+또한 빈 컨테이너를 null 로 만드는 특성으로 종종 프로그래머를 골탕먹이는 문제도 있다.
+이를 해결하기 위해 &lt;a href=&quot;https://github.com/akkadotnet/Wire&quot;&gt;wire&lt;/a&gt; 혹은 다른 것을 사용해보자.&lt;/p&gt;
+
+&lt;h4 id=&quot;distributed-actortable&quot;&gt;Distributed ActorTable&lt;/h4&gt;
+
+&lt;p&gt;현재 &lt;a href=&quot;https://github.com/SaladLab/Akka.Cluster.Utility&quot;&gt;Akka.Cluster.Utility&lt;/a&gt; 에 있는 
+&lt;a href=&quot;https://github.com/SaladLab/Akka.Cluster.Utility/blob/master/docs/DistributedActorTable.md&quot;&gt;DistributedActorTable&lt;/a&gt; 는
+분산 액터 테이블을 제공한다. 다만 테이블 자체는 분산되지 못해 SPOF/B 가 된다.
+때문에 이를 완전히 분산된 테이블로 개선하는 작업이 필요하다.&lt;/p&gt;
+
+&lt;h4 id=&quot;net-core-&quot;&gt;.NET Core 지원&lt;/h4&gt;
+
+&lt;p&gt;.NET Core 를 지원하자. 이를 통해 가벼운 배포가 가능하고 리눅스에서도 서버를 돌릴 수 있다.
+다만 이것은 종속 라이브러가 모두 .NET Core 를 지원하는 시점에서 시작 할 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;section-9&quot;&gt;정리&lt;/h3&gt;
+
+&lt;p&gt;한 1개월이면 충분하지 않을까 했던 작업이 2개월이나 걸려 완료되었다.
+생각보다 오래 걸린 것은 아쉽지만 잘 마무리되어 다행이다 :)&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 15 Jul 2016 00:00:00 +0900</pubDate>
+        <link>http://veblush.github.io/ko/posts/akkanet-online-game-works-for-the-last-2-months/</link>
+        <guid isPermaLink="true">http://veblush.github.io/ko/posts/akkanet-online-game-works-for-the-last-2-months/</guid>
+        
+        
+        <category>akkanet</category>
+        
+      </item>
     
       <item>
         <title>Akka.NET 으로 만드는 온라인 게임 서버</title>
@@ -1634,326 +2021,6 @@ WinSxS 에 등록해 파일이 8~12 개씩 쌓여 용량을 많이 차지하고 
         
         
         <category>windows</category>
-        
-      </item>
-    
-      <item>
-        <title>버전 관리 시스템의 마이그레이션 전략과 방법</title>
-        <description>&lt;p&gt;최근에 버전 관리 시스템 마이그레이션 작업을 진행하고 있고 작년에는 저장소 재구성 작업을 했었다.
-작업을 진행하면서 고민했던 마이그레이션 전략과 방법을 정리했다.&lt;/p&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;마이그레이션&lt;/h2&gt;
-
-&lt;p&gt;저장소 마이그레이션은 예전 저장소에서 새 저장소로 데이터를 옮기는 과정이다.
-이 과정은 아래의 그림과 같이 예전 저장소에 있는 파일과 로그를 익스포트하는 과정과 여기서 얻은 데이터를 새 저장소로 임포트하는 과정으로 이루어진다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Repo.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;특히 마이그래이션 작업은 두 저장소가 다른 버전 관리 시스템에 있을 때 까다로워진다.
-만약 두 시스템의 리비전 모델이 많이 다른 경우라면 더욱 그렇다.
-예를 들어 subversion 의 경우 디렉토리도 파일과 같이 리비전 대상이 되지만
-mercurial 의 경우에는 그렇지 않다.
-때문에 subversion 의 mkdir 작업은 mercurial 에서는 빠져야 하고 반대로 mercurial 에서
-subversion 으로 올 때는 적당한 시점에 mkdir 작업을 임의로 넣어줘야 한다.
-(다행히 subversion → mercurial 은 &lt;a href=&quot;https://bitbucket.org/durin42/hgsubversion/wiki/Home&quot;&gt;hgsubversion&lt;/a&gt;
- 툴이 있어 간편하게 마이그레이션 할 수 있다)
-최대한 예전 저장소의 구조와 데이터를 유지하면서 마이그레이션을 할 수 있다면 좋겠지만
-그 만큼 개발 비용이 소모되니 절충안을 잘 선택해야 한다.
-이제 여러 전략을 살펴보고 장단점을 따져 최적의 방법을 골라보자.&lt;/p&gt;
-
-&lt;h2 id=&quot;section-1&quot;&gt;예제 데이터, 전략의 이점&lt;/h2&gt;
-
-&lt;p&gt;설명을 위해 아래와 같은 예제 저장소 데이터를 가정하자. &lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-A.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;가로축이 리비전 증가다. 리비전 1 부터 4 까지 총 4개의 리비전 변화가 있었다.
-저장소의 파일은 노드로 표시되고 “파일이름 &amp;lt;내용&amp;gt;” 형식으로 표현되어 있다.
-위 그림에서 리비전 2 에는 apple 과 banana 파일 있는 것을 알 수 있다.
-또 가장 최근 리비전 4 에는 banana 와 orange 파일이 있는 것을 알 수 있다.
-리비전이 증가함에 따라 파일이 변하는데 파일의 변화는 노드 사이를 잇는 선으로 표시한다.
-변화를 발생시키는 파일 변경 내용은 A(dd, 추가), M(odify, 변경), C(opy, 복사), D(elete, 삭제) 이렇게 네 가지가 있다.
-위 그림에서 리비전 2 → 3 과정을 보면 apple 파일은 삭제되고,
-banana 파일은 내용이 brown 으로 수정되고 orange 는 banana 로부터 복사되었음을 알 수 있다.&lt;/p&gt;
-
-&lt;p&gt;각 마이그레이션 전략이 제공하는 이점이 있다.
-먼저 어떤 이점이 있는지 살펴보고 각 전략이 그 중 어떤 이점을 제공하는지 다루기로 하자.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;현재 스냅샷 유지
-가장 마지막 리비전의 파일의 구성은 최소한 유지되어야 올바른 마이그레이션이다.
-과거 데이터가 어떻든 새 저장소에서 현재 파일을 받았을때 예전 저장소와 동일한 파일이 받아져야 한다.
-따라서 유지되어야할 필수 조건이다.
-(예제 데이터의 새 저장소에서 최신 리비전을 받으면 banana, orange 가 나와야 한다.)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;과거 시점의 스냅샷의 완결성 유지
-과거 시점의 파일을 받았을 때 그 시점의 파일 구성이 올바르게 받아지는지 여부다.
-예를 들서 1년전 저장소 상태의 파일을 받겠다 라고 했을 때 그 때의 구성으로 올바르게 받아지는지 여부다.
-(예제 데이터의 리비전 2 데이터를 요청했을 때 정확히 apple 과 banana 가 받아져야 한다.)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;현재 파일의 변경 내역 유지
-현재 스냅샷에 포함되어 있는 파일들의 변경 이력이 제대로 나오는지 여부다.
-현재 파일의 과거 버전을 받을 수도 있고 수정 내역을 통해 blame 을 할 수도 있다.
-(예제 데이터의 banana 이력을 요청하면 yellow → brown → black 으로 변해 왔는지를 알 수 있어야 한다.)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;그럼 어떤 전략이 있는지 살펴보자.&lt;/p&gt;
-
-&lt;h2 id=&quot;section-2&quot;&gt;전략: 현재 스냅샷&lt;/h2&gt;
-
-&lt;p&gt;현재 스냅샷 (마지막 리비전에 포함되어 있는 모든 파일) 을 새 저장소에 그대로 추가 하는 방식이다.
-과거 이력은 모두 무시하고 현재 파일만 이동하는 전략이다.
-새 저장소에 옮겨진 리비전의 모습은 아래 그림과 같으며 과거 리비전에 대한 정보가 모두 사라졌음을 볼 수 있다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-B.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;이 방법은 간단하다. 단순히 예전 저장소의 최신파일을 받아 새 저장소에 추가하는 것으로 충분하다.
-때문에 마이그레이션 비용이 가장 적고 그래서 많이 사용되는 방법이기도 하다.
-만약 과거 리비전 로그를 살리는 것이 중요하지 않다면 좋은 방법이다.&lt;/p&gt;
-
-&lt;p&gt;이점: 현재 스냅샷 유지&lt;/p&gt;
-
-&lt;h2 id=&quot;section-3&quot;&gt;전략: 주요 스냅샷&lt;/h2&gt;
-
-&lt;p&gt;중요 포인트가 되는 리비전들을 정하고 그 리비전들의 파일과 그 리비전 사이마다 차이를 남기는 방식이다.
-예를 들어 알파 테스트, 베타 테스트, 공개 오픈 이렇게 세 시점이 중요 포인트고 그 시점의 스냅샷과
-그 사이의 변화를 남기고 싶다면 이 방법을 사용할 수 있다.
-아래 그림은 중요 포인트로 리비전 2와 4를 선택했을 경우의 새 저장소의 리비전 모습이다.
-리비전 2, 4 시점의 파일은 정확히 남고 그 사이의 이력은 뭉게지는 것을 볼 수 있다.
-(banana 의 파일 내용이 yellow 에서 바로 black 이 되는 것이 한 예이다.)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-C.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;방법도 간단하다. 먼저 중요 포인트의 리비전에 해당하는 파일을 모두 받는다.
-이것을 리비전 별로 묶고 아래와 같은 절차를 밟는다.
-가장 첫 리비전에 포함되는 파일은 모두 그대로 새 저장소에 추가
-그 다음 리비전 r 에 대해서 포함되어 있는 파일에 대해서
-- 새 저장소에 없는 파일이 리비전 r 에 있다면 : Add file
-- 새 저장소에 있던 파일이 리비전 r 에 없다면 : Delete file
-- 새 저장소와 리비전 r 에 모두 있지만 내용이 다르다면 : Modify file&lt;/p&gt;
-
-&lt;p&gt;위 내용을 새 저장소에 커밋. 마지막 리비전이 될 때까지 반복
-그다지 복잡하지 않다. 다만 새 저장소에 대해 위에서 설명한 리비전 변경 작업을 생성해 내고
-수행 하는 스크립트 작업을 해야 한다. 하지만 상대적으로 간단한 기능만으로 가능하기 때문에 수월한 편이다.
-또한 중요 포인트를 촘촘히 설정하면 이력이 뭉게지는 범위를 좁힐 수 있다.&lt;/p&gt;
-
-&lt;p&gt;이점: 최근 스냅샷 유지 + (주요) 과거 시점의 스냅샷의 완결성 유지&lt;/p&gt;
-
-&lt;h2 id=&quot;section-4&quot;&gt;전략: 현재 파일의 변경 로그 유지&lt;/h2&gt;
-
-&lt;p&gt;과거 스냅샷 보다는 현재 파일이 어떻게 변해왔는지를 유지하는게 중요하다면
-현재 파일의 변경 로그 유지 방법을 사용해볼 수 있다.
-이 방법은 마지막 리비전에 있는 파일과 이력만 새 저장소로 마이그레이션 하는 방법이다.
-예제 데이터의 마지막 리비전 4에는 banana 와 orange 파일이 있는데
-이 파일에 대한 이력만 추려서 새 저장소를 구성하면 아래와 같은 그림을 얻을 수 있다.
-이 방법은 현재 남아있는 파일의 이력이 남기 때문에 blame 등의 기능을 종전과 같이 그대로 사용할 수 있는 장점이 있다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-D.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;구현은 예전 저장소에 있는 모든 파일들의 과거 이력을 얻는 것으로 시작한다.
-개별 이력을 얻는 것이 보통의 버전 관리 시스템은 빠르지 않기 때문에 파일이
-많은 경우 전체 리비전 정보로 부터 개별 파일 정보를 재구축 하는 것이 효율적이다.&lt;/p&gt;
-
-&lt;p&gt;예전 저장소 모든 리비전 r 에 대해 순서대로
-리비전 r 에 해당하는 현재 파일의 이력이 있는 경우
-- 그 파일의 첫 로그라면: Add file
-- 그렇지 않은 경우라면: Modify file&lt;/p&gt;
-
-&lt;p&gt;새 저장소에 변경 내용 커밋
-이 방법 역시 그다지 복잡하지 않다. 예전 저장소에서 개별 파일 이력을 얻는 부분도
-일반적으로 대부분의 버전 관리 시스템이 지원하기 때문에 손쉽게 얻을 수 있다.
-새 저장소에 파일을 추가하고 변경 내역을 구축하는 것도 Add 와 Modify 기능만으로 가능하기 때문에 간단하다.
-특히 소스 저장소의 blame 을 그대로 사용할 수 있어 좋다.
-또한 이미 삭제된 파일에 대한 데이터를 옮기지 않아 새 저장소 용량 절감 효과도 있다.&lt;/p&gt;
-
-&lt;p&gt;이점: 최근 스냅샷 유지 + 현재 파일의 변경 사항 로그 유지&lt;/p&gt;
-
-&lt;h2 id=&quot;section-5&quot;&gt;전략: 변경 리플레이&lt;/h2&gt;
-
-&lt;p&gt;예전 저장소의 모든 파일과 변경 이력을 최대한 그대로 마이그레이션 하고 싶다면
-리비전 로그를 순서대로 새 저장소에서 동등하게 재현하는 변경 리플레이 방법을 사용할 수 있다.
-이 방법은 최대한 모든 데이터를 그대로 새 저장소에 넣는 방식이기 때문에
-매끄러운 마이그레이션이 가능하지만 그 만큼 비용이 많이 들 수 있다.
-특히 서로 다른 버전 관리 시스템 간의 마이그레이션의 경우 제공되는 마이그레이션 솔루션이
-없다면 손이 많이 가는 작업이 될 가능성이 높다.
-만약 1:1 로 완벽하게 마이그레이션이 가능하다면 아래 그림처럼 예제와 동일한 로그가 새 저장소에 구축된다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-A.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;방법은 기본적으로 간단하다. 예전 저장소의 변경 내용을 순서대로 새 저장소에 적용하면 된다.
-예전 저장소 모든 리비전 r 에 대해 순서대로
-리비전 r 을 구성하는 변경 로그에 대해서
-- 변경 로그가 add 면 새 저장소에 add
-- 변경 로그가 modify 면 새 저장소에 modify
-- 변경 로그가 delete 면 새 저장소에 delete
-- …&lt;/p&gt;
-
-&lt;p&gt;새 저장소에 변경 내용 커밋
-서로 다른 저장소의 경우 리비전 변경을 구성하는 집합 (add, modify, …) 이
-달라 변환 과정이 필요한 경우가 많다.
-따라서 완전한 구현을 목표로 하기 보다는 가능한 변경 집합을 제한하고 처리할 수 없는 것은
-적당히 예외 처리하는 것이 현실적이다.
-(예를 들어 브랜치는 기본 모델 부터 다른 경우도 있다.)
-적당한 선에서 탑협을 해 이 방법을 사용할 수 있다면 가장 완전한 마이그레이션이 될 수 있다.&lt;/p&gt;
-
-&lt;p&gt;이점: 현재 스냅샷 파일 유지 + 과거 시점의 스냅샷의 완결성 유지 + 현재 파일의 변경 내역 유지 &lt;/p&gt;
-
-&lt;h2 id=&quot;section-6&quot;&gt;전략: 최신 스냅샷 + 현재 파일의 변경 로그 유지&lt;/h2&gt;
-
-&lt;p&gt;기본적으로 최신 스냅샷을 사용하되 중요 파일에 대해서만 현재 파일의 변경 로그 유지 방법을 사용한다.
-아래 그림은 orange 에 대해서는 최신 스냅샷을 banana 에 대해서는 변경 로그 유지를 적용한 예이다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-F.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;방법은 현재 파일 변경 로그 유지와 유사하다.
-중요 파일은 기존과 같게 동작하도록 하고 그렇지 않은 파일에 대해서 로그를 옮기지 않으면 된다.
-이 방법은 새 저장소의 용량을 절약할 수 있는 장점이 있다.&lt;/p&gt;
-
-&lt;p&gt;이점: 최근 스냅샷 유지 + (중요) 현재 파일의 변경 사항 로그 유지&lt;/p&gt;
-
-&lt;h2 id=&quot;section-7&quot;&gt;전략: 주요 스냅샷 + 현재 파일의 변경 로그 유지&lt;/h2&gt;
-
-&lt;p&gt;기본적으로 주요 스냅샷을 사용하고 마지막 스냅샷과 직전 스냅샷 사이는
-변경 로그 유지 기능을 사용해 최근 변경 로그를 유지 하는 방법이다.
-아래는 리비전 2, 4 를 주요 스냅샷으로 남기고 리비전 2 → 4 사이의 변경 로그를 유지한 예이다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/posts/2012-10-31-vcs-migration-strategy/Revision-E.gv.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;방법은 마지막 리비전 직전까지는 주요 스냅샷과 동일하고 마지막 리비전 단계에서
-현재 파일의 변경 로그 유지 방법과 동일하다. 이 방법은 주요 스냅샷을 재구성할 수 있고
-현재 파일들의 최근 변경 사항을 확인할 수 있는데 특히 변경 이력은 과거는 그다지
-상세할 필요가 없는데 반해 최근은 상세한 것이 좋기 때문에 적절히 균형을 맞춘 것이라 볼 수 있다.
-과거 이력을 상세히 남기지 않기 때문에 저장소의 공간을 절약하는 장점이 있다.&lt;/p&gt;
-
-&lt;p&gt;이점: 최근 스냅샷 유지 + (주요) 과거 시점의 스냅샷의 완결성 유지 + 현재 파일의 (최근) 변경 사항 로그 유지&lt;/p&gt;
-
-&lt;h2 id=&quot;section-8&quot;&gt;브랜치&lt;/h2&gt;
-
-&lt;p&gt;브랜치는 앞서 설명한 트렁크에 발생하는 작업 이력에 비해 복잡하다.
-특히 버전 관리 시스템 마다 특징히 달라 저장소 리플레이로 커버하기 어려울 수 있다.
-이럴 때는 브랜치가 생성되는 시점과 브랜치 마지막 시점을 주요 스냅샷 방법을 사용해
-구성해 주는 간단한 방법을 사용하는 것이 좋다.
-보통 브랜치 보다는 트렁크의 로그가 중요하기 때문에 브랜치 시점과 현재 모습을 유지하는 쪽이 좋다.&lt;/p&gt;
-
-&lt;h2 id=&quot;section-9&quot;&gt;주요 버전 컨트롤 시스템의 명령 예&lt;/h2&gt;
-
-&lt;p&gt;마이그레이션 작업 때 다뤄봤던 subversion, mercurial, perforce 의 대략의 사용법과 팁을 남겨둔다.&lt;/p&gt;
-
-&lt;h3 id=&quot;subversion&quot;&gt;Subversion&lt;/h3&gt;
-
-&lt;p&gt;익스포트 작업 주요 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;svn list path                    &lt;span class=&quot;c&quot;&gt;# 디렉토리/파일 목록 출력&lt;/span&gt;
-svn log                          &lt;span class=&quot;c&quot;&gt;# 저장소 리비전 로그 출력&lt;/span&gt;
-svn log -v -r rev                &lt;span class=&quot;c&quot;&gt;# 리비전 작업 내용 출력&lt;/span&gt;
-svn cat -r rev path &amp;gt; savepath   &lt;span class=&quot;c&quot;&gt;# 특정 리비전 때의 파일 내용 저장&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;파일 작업 주요 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;svn add filename                 &lt;span class=&quot;c&quot;&gt;# 추가&lt;/span&gt;
-svn delete filename              &lt;span class=&quot;c&quot;&gt;# 삭제&lt;/span&gt;
-svn move oldpath newpath         &lt;span class=&quot;c&quot;&gt;# 이동&lt;/span&gt;
-svn copy srcpath dstpath         &lt;span class=&quot;c&quot;&gt;# 복사&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;커밋 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;svn commit -m LOG
-svn propset --revprop -r HEAD svn:author AUTHOR
-svn propset --revprop -r HEAD svn:date 2012-10-27T00:30:15.000000Z
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;SVN 의 propset 을 사용하기 위해서는 서버의 pre-revprop-change 가 exit 1 등으로 설정되어 있어야 한다.
-그리고 svn:data 는 UTC 시간이다.
-특히 Subversion 은 commit 을 저장소 루트 디렉토리하는 것이 원칙이나 빠르게
-처리 하기 위해 변경이 발생한 디렉토리의 공통 부모 디렉토리에서 하는 것이 좋다.
-(가끔 update 가 필요하다고 svn 이 에러를 내면 저장소 루트에서 update 를 한 번 수행하면 해결이 된다)&lt;/p&gt;
-
-&lt;h3 id=&quot;mercurial&quot;&gt;Mercurial&lt;/h3&gt;
-
-&lt;p&gt;익스포트 작업 주요 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;hg log                           &lt;span class=&quot;c&quot;&gt;# 저장소 리비전 로그 출력&lt;/span&gt;
-hg log -v -r rev                 &lt;span class=&quot;c&quot;&gt;# 리비전 작업 내용 출력&lt;/span&gt;
-hg cat -r rev path &amp;gt; savepath    &lt;span class=&quot;c&quot;&gt;# 특정 리비전 때의 파일 내용 저장&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;파일 작업 주요 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;hg add filename                  &lt;span class=&quot;c&quot;&gt;# 추가&lt;/span&gt;
-hg remove filename               &lt;span class=&quot;c&quot;&gt;# 삭제&lt;/span&gt;
-hg rename oldpath newpath        &lt;span class=&quot;c&quot;&gt;# 이동&lt;/span&gt;
-hg copy srcpath dstpath          &lt;span class=&quot;c&quot;&gt;# 복사&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;커밋 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;hg commit -m LOG -u AUTHOR -d &lt;span class=&quot;s2&quot;&gt;&quot;2012-10-27 09:30:15&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Subversion 과 비슷하다.
-하지만 DVCS 라서 commit 명령어에서 자유롭게 author 와 date 를 지정할 수 있는 것이 특징이다.
-또한 저장소가 로컬에 있기 때문에 디렉토리/파일 목록은 dir, ls 등을 사용하면 된다.
-hg 의 경우 실제 변경사항이 없는데 commit 을 요청하면 에러를 발생하니 이 부분에 대한 예외 처리가 필요하다.&lt;/p&gt;
-
-&lt;h3 id=&quot;perforce&quot;&gt;Perforce&lt;/h3&gt;
-
-&lt;p&gt;익스포트 작업 주요 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;p4 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dirs&lt;/span&gt;/files] path             &lt;span class=&quot;c&quot;&gt;# 디렉토리/파일 목록 출력&lt;/span&gt;
-p4 changes                       &lt;span class=&quot;c&quot;&gt;# 저장소 리비전 로그 출력&lt;/span&gt;
-p4 describe rev                  &lt;span class=&quot;c&quot;&gt;# 리비전 작업 내용 출력&lt;/span&gt;
-p4 print -o savepath path@rev    &lt;span class=&quot;c&quot;&gt;# 특정 리비전 때의 파일 내용 저장&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;파일 작업 주요 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;p4 edit filename                 &lt;span class=&quot;c&quot;&gt;# 편집&lt;/span&gt;
-p4 add filename                  &lt;span class=&quot;c&quot;&gt;# 추가&lt;/span&gt;
-p4 delete filename               &lt;span class=&quot;c&quot;&gt;# 삭제&lt;/span&gt;
-p4 rename oldpath newpath        &lt;span class=&quot;c&quot;&gt;# 이동&lt;/span&gt;
-p4 copy srcpath dstpath          &lt;span class=&quot;c&quot;&gt;# 복사&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;커밋 명령어&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;p4 submit -d LOG
-p4 change -o REV | change &lt;span class=&quot;s2&quot;&gt;&quot;Date:&quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;User:&quot;&lt;/span&gt; | p4 change -i -f
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Perforce 는 checkout 방식이므로 편집 전에 수정 요청을 해야한다.
-그리고 perforce 의 경우 파일타입 설정에 주의를 기울여야 한다.
-(잘못 설정하면 파일이 깨지거나 submit 단계에 에러가 나거나 p4merge 에서 이상하게 나올 수 있다.
- 마이그레이션 작업전에 &lt;a href=&quot;http://www.perforce.com/perforce/doc.current/manuals/p4guide/ab_filetypes.html&quot;&gt;p4_filetypes&lt;/a&gt;
- 내용을 잘 살펴봐야 한다.)
-또한 파일이름에 &lt;code class=&quot;highlighter-rouge&quot;&gt;@&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;#&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;*&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;%&lt;/code&gt; 문자가 포함되어 있는 경우 이스케입을 해줘야 한다.&lt;/p&gt;
-
-&lt;h2 id=&quot;section-10&quot;&gt;결론&lt;/h2&gt;
-
-&lt;p&gt;저장소 마이그레이션의 여러 전략을 살펴보았다.
-각 전략의 이점과 비용을 잘 살펴보고 최적의 방법을 결정하는 것이 중요하다.
-또 저장소의 데이터는 프로젝트의 중요한 자산이니 무엇보다도 안전하게 누락없이 데이터를 옮기는데 주의를 기울여야 한다.&lt;/p&gt;
-</description>
-        <pubDate>Wed, 31 Oct 2012 00:00:00 +0900</pubDate>
-        <link>http://veblush.github.io/ko/posts/vcs-migration-strategy/</link>
-        <guid isPermaLink="true">http://veblush.github.io/ko/posts/vcs-migration-strategy/</guid>
-        
-        
-        <category>scm</category>
         
       </item>
     

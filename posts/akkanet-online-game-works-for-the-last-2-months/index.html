@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="Esun Kim">
+    <meta name="description" content="veblush, programmer.">
+
+    <title>Online game server works on Akka.NET for the last 2 months</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="alternate" type="application/rss+xml" title="veblush" href="http://veblush.github.io/feed.xml">
+    <meta http-equiv="Content-Language" content="en"><link rel="alternate" i18n="en" href="https://veblush.github.io/posts/akkanet-online-game-works-for-the-last-2-months/" />
+<link rel="alternate" i18n="ko" href="https://veblush.github.io/ko/posts/akkanet-online-game-works-for-the-last-2-months/" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="links align-left">
+          
+            <a 
+               
+                 style="font-weight: bold;"
+               
+                 
+               
+               
+               class="top-about-link" href="/">
+              Posts
+            </a>
+          
+            <a 
+               
+               
+               class="top-about-link" href="/about/">
+              About
+            </a>
+          
+        </span>
+        <span class="links align-right">
+          
+            <a style="font-weight: bold;" class="top-about-link" href=" /posts/akkanet-online-game-works-for-the-last-2-months/ ">en</a>
+          
+            <a  class="top-about-link" href=" /ko/posts/akkanet-online-game-works-for-the-last-2-months/ ">ko</a>
+          
+        </span>
+      </div>
+
+      <div class="site">
+        <div class="post">
+  <h2 class="title">Online game server works on Akka.NET for the last 2 months</h2>
+  <p class="meta">2016-07-15</p>
+
+  <div class="content">
+  <p>I’ve been working on works related to <a href="http://veblush.github.io/posts/online-game-server-on-akkanet/">Online game server on Akka.NET</a>
+which I made a speech about at NDC 2016. Most of work is for polishing and paying down the technical debt.
+This article explains what has been done and what will be (maybe) done later.</p>
+
+<h3 id="works-done">Works done</h3>
+
+<h4 id="expressive-interface">Expressive Interface</h4>
+
+<p><a href="https://github.com/SaladLab/Akka.Interfaced">Akka.Interfaced</a> uses C# <code class="highlighter-rouge">interface</code> to define a contract
+for communicating with an actor. It’s natural for C# programmer and makes easy to send and receive messages with actors.
+However <code class="highlighter-rouge">interface</code> is used and programmers seem to expect that major interface features are possible to use,
+generic and inheritance are supported to satisfy this.</p>
+
+<h6 id="generic">Generic</h6>
+
+<p>Generic interface and method are supported and following interface can be defined.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="c1">// generic interface
+</span><span class="k">interface</span> <span class="n">IGreeter</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IInterfacedActor</span> <span class="p">{</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">Greet</span><span class="p">&lt;</span><span class="n">U</span><span class="p">&gt;(</span><span class="n">U</span> <span class="n">name</span><span class="p">);</span> <span class="c1">// generic method
+</span>    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="nf">GetCount</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Actor can implement the previous interface like:</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">class</span> <span class="n">GreetingActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span><span class="p">,</span> <span class="n">IGreeter</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">Greet</span><span class="p">(</span><span class="kt">string</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">Greet</span><span class="p">&lt;</span><span class="n">U</span><span class="p">&gt;(</span><span class="n">U</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Supporting generic interface was quite simple because generic parameters are determined at the time of creating an actor.
+But for generic method, it was not because new generic handler should be instantiated
+whenever new message containing different parameters arrives.</p>
+
+<p>Related issue: <a href="https://github.com/SaladLab/Akka.Interfaced/issues/30">Generic interface #30</a></p>
+
+<h6 id="inheritance">Inheritance</h6>
+
+<p><code class="highlighter-rouge">Interface</code> inheritance can be used like following. Work to support it was simple.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">public</span> <span class="k">interface</span> <span class="n">IGreeter</span> <span class="p">:</span> <span class="n">IInterfacedActor</span> <span class="p">{</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">Greet</span><span class="p">(</span><span class="kt">string</span> <span class="n">name</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">interface</span> <span class="n">IGreeterEx</span> <span class="p">:</span> <span class="n">IGreeter</span> <span class="p">{</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">GreetEx</span><span class="p">(</span><span class="kt">string</span> <span class="n">name</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Related issue: <a href="https://github.com/SaladLab/Akka.Interfaced/issues/27">Support interface inheritance #27</a></p>
+
+<h4 id="polishing-api">Polishing API</h4>
+
+<p>At the previous Proof-Of-Concept stage, all works were for implementing and verifying the idea, not for polishing.
+Because polishing itself costs many hours than expected and doesn’t always end up with good result.
+But this time is good for this polishing.</p>
+
+<h6 id="remove-crtp-curiously-recurring-template-pattern">Remove CRTP (Curiously Recurring Template Pattern)</h6>
+
+<p>Base class, <code class="highlighter-rouge">InterfacedActor</code> needs a dedicate place to store a message dispatch table for each class.
+CRTP is convenient to handle this because generic class always allocate new static storage when being instantiated.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">GreeterActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span><span class="p">&lt;</span><span class="n">GreeterActor</span><span class="p">&gt;,</span> <span class="n">IGreeter</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>But this pattern causes programmer make a silly mistake like providing a wrong generic parameter.
+For previous case, wrong base class such as <code class="highlighter-rouge">InterfacedActor&lt;GuestActor&gt;</code> cannot prevent compiler to build it
+but will throw runtime exception. It’s not good for safe programming environment so improved like following.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">GreeterActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span><span class="p">,</span> <span class="n">IGreeter</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Related issue: <a href="https://github.com/SaladLab/Akka.Interfaced/issues/20">Change InterfacedActor&lt;T&gt; to InterfacedActor #20</a></p>
+
+<h6 id="unhandled-exception-policy">Unhandled exception policy</h6>
+
+<p>Previous version of <code class="highlighter-rouge">InterfacedActor</code> always returns an exception back to a requester
+an unhandler exception is thrown while processing requests.
+This decision was made because Requester-Responder is similar with Caller-Callee.
+But Akka.NET doesn’t work like this and it becomes a problem.
+Akka.NET actor always propagates unhandled exceptions to a supervisor (usually parent) not to a requester. (<a href="http://getakka.net/docs/Fault%20tolerance">Fault Tolerance</a>)
+If the interfaced actor works different from Akka.NET standard way, it could be a source of confusion.
+Because of this, <code class="highlighter-rouge">InterfacedActor</code> is updated to follow the standard way but the other option is provided.
+If you want to propagate an unhandled exception to requester like before, <code class="highlighter-rouge">ResponsiveException</code> can be used.
+Following <code class="highlighter-rouge">Greet</code> method will propagate only <code class="highlighter-rouge">ArgumentException</code> to requester and others to supervisor.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">GreeterActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span><span class="p">,</span> <span class="n">IGreeter</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nf">ResponsiveException</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">ArgumentException</span><span class="p">))]</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">IGreeter</span><span class="p">.</span><span class="nf">Greet</span><span class="p">(</span><span class="kt">string</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Related issue: <a href="https://github.com/SaladLab/Akka.Interfaced/issues/21">Exception policy for handling request, notification and message. #21</a></p>
+
+<h6 id="add-extensions-to-observer-and-message-handler-like-request-handler">Add extensions to observer and message handler like request handler</h6>
+
+<p><code class="highlighter-rouge">InterfacedActor</code> can handle 3 different types of message.</p>
+
+<ul>
+  <li>Request: Request messages which are defined at <code class="highlighter-rouge">IInterfacedActor</code>.</li>
+  <li>Notification: Event notification messages which are defined at <code class="highlighter-rouge">IInterfacedObserver</code>.</li>
+  <li>Message: Message which have a handler annotated by <code class="highlighter-rouge">[MessageHandler]</code>.</li>
+</ul>
+
+<p>Among these kinds of message, only Request handler could make use of filter and the extended handler.
+But programmers expect that these kinds of message are equally supported so same features are added to notification and message handler.</p>
+
+<p><code class="highlighter-rouge">LogFilter</code> can be used for message handler now.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TestActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">MessageHandler</span><span class="p">,</span> <span class="n">Log</span><span class="p">]</span>
+    <span class="k">private</span> <span class="k">void</span> <span class="nf">OnMessage</span><span class="p">(</span><span class="kt">string</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Notification handler for observer can be implemented with an extended handler.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TestActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span><span class="p">,</span> <span class="n">IExtendedInterface</span><span class="p">&lt;</span><span class="n">ISubjectObserver</span><span class="p">&gt;</span>
+    <span class="p">[</span><span class="n">ExtendedHandler</span><span class="p">]</span>
+    <span class="k">void</span> <span class="nf">Event</span><span class="p">(</span><span class="kt">string</span> <span class="n">eventName</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Related issue: <a href="https://github.com/SaladLab/Akka.Interfaced/issues/16">Let observer handler work with ExtendedHandler and Filter like Interfaced handler. #16</a></p>
+
+<h6 id="terse-slimclient-api">Terse SlimClient API</h6>
+
+<p>SlimClient does not depend on Akka.NET to make actors accessible from clients outside of Akka.NET.
+Because <code class="highlighter-rouge">ActorRef</code> for SlimClient is imeplemented quite differently, interpretation is required to
+send and receive <code class="highlighter-rouge">InterfacedActorRef</code> and <code class="highlighter-rouge">InterfacedObserver</code> across the boundary between SlimClient and Akka.NET.</p>
+
+<p>For example, following code shows IUserLogin.Login which gets an observer created at SlimClient and
+returns User actorRef created at Akka.NET to SlimClient.
+Previous version of library forced you to use ID and translate it manually to pass and construct UserRef.
+It is not a transparent API and makes bloated code.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">interface</span> <span class="n">IUserLogin</span> <span class="p">:</span> <span class="n">IInterfacedActor</span> <span class="p">{</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="nf">Login</span><span class="p">(</span><span class="kt">int</span> <span class="n">observerId</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">var</span> <span class="n">userId</span> <span class="p">=</span> <span class="n">await</span> <span class="n">userLogin</span><span class="p">.</span><span class="nf">Login</span><span class="p">(...);</span>
+<span class="n">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">UserRef</span><span class="p">(</span><span class="k">new</span> <span class="nf">SlimActor</span><span class="p">(</span><span class="n">userId</span><span class="p">),</span> <span class="nf">SlimRequestWaiter</span><span class="p">(</span><span class="n">_comm</span><span class="p">,</span> <span class="k">this</span><span class="p">)));</span>
+</code></pre>
+</div>
+
+<p>It’s improved like following. <code class="highlighter-rouge">InterfacedActorRef</code> and <code class="highlighter-rouge">InterfacedObserver</code> can be used directly like Akka.NET.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">interface</span> <span class="n">IUserLogin</span> <span class="p">:</span> <span class="n">IInterfacedActor</span> <span class="p">{</span>
+    <span class="n">Task</span><span class="p">&lt;</span><span class="n">IUser</span><span class="p">&gt;</span> <span class="nf">Login</span><span class="p">(</span><span class="n">IUserObserver</span> <span class="n">observer</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">var</span> <span class="n">user</span> <span class="p">=</span> <span class="n">await</span> <span class="n">userLogin</span><span class="p">.</span><span class="nf">Login</span><span class="p">(...);</span>
+</code></pre>
+</div>
+
+<p>Related issue: <a href="https://github.com/SaladLab/Akka.Interfaced/issues/23">Concise way for retrieving InterfacedActorRef on slim-client. #23</a></p>
+
+<h4 id="extend-slimclient-channel">Extend SlimClient channel</h4>
+
+<p>Single TCP channel has been extended.</p>
+
+<h5 id="udp-support">UDP Support</h5>
+
+<p>UDP channel is introduced in addition to UDP. Rationale for adding UDP channnel is:</p>
+
+<ul>
+  <li>
+    <p>HandOver: There is an issue on TCP for handling handover on mobile environment.
+To make it happen, reliable data transfer layer should be implemented on top of TCP.
+Instead of hard work on TCP, how about using reliable UDP?
+It’s better for fast hand-over because it doesn’t establish the connection.</p>
+  </li>
+  <li>
+    <p>Various QOS:
+TCP allows only reliable and ordered transmission but UDP allows many options
+such as reliable-unoredered and unreliable. For sending player movement notification message,
+unreliable-sequenced is enough and more performant than TCP.</p>
+  </li>
+</ul>
+
+<p><a href="https://github.com/lidgren/lidgren-network-gen3">Lidgren Network Library</a> is chosen to be used
+even it is not designed for server environment because writing robust communication library 
+takes lots of effort. Just <a href="https://github.com/SaladLab/LidgrenUdpNet">forked</a> it and updated it to meet my own requirements.
+Following works are done.</p>
+
+<ul>
+  <li>Support Add .NET 3.5 to nuget package: <a href="https://www.nuget.org/packages/LidgrenUdpNet/">LidgrenUdpNet</a></li>
+  <li>Support UnityPackage: <a href="https://github.com/SaladLab/LidgrenUdpNet/releases">LidgrenUdpNet for Unity3D</a></li>
+  <li>Add fast message handler.</li>
+  <li>Connection is defined not by EndPoint but by ConnectionID to allow hand-over between WiFi and 3G.</li>
+</ul>
+
+<p>And also Lidgren Network Library provides a P2P network feature which is a good tool for network game.</p>
+
+<h5 id="remote-channel-binding">Remote channel binding</h5>
+
+<p>Remote channel binding allow clients to connect another servers owning specfic actors directly.
+Previous one allowed clients to access remote actor only via a channel establised at first connection. 
+(Forwarding Channel in the following figure)
+This method is quite simple to use but it causes unncessary traffic for forwarding channel.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>   * Forwarding Channel                          * Direct Channel
+   Client -&gt; Channel1 -&gt; UserActor               Client -&gt; Channel1 -&gt; UserActor        
+                |                                   | 
+             ~~~|~~~~                               |      ~~~~~~~~
+                |                                   |
+                +---- -&gt; GameActor                  +----&gt; Channel2 -&gt; GameActor
+</code></pre>
+</div>
+
+<p>To deal with this problem, client can establish a channel on remote server to access remote actors.
+(Direct Channel in the previous figure)</p>
+
+<p>Following code shows how server open a remote channel to allow client to access GameActor directly.
+It opens a remote channel and returns connection information to a client.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="n">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IGamePlayer</span><span class="p">&gt;</span> <span class="n">IUser</span><span class="p">.</span><span class="nf">JoinGame</span><span class="p">(</span><span class="kt">long</span> <span class="n">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">game</span> <span class="p">=</span> <span class="nf">GetGame</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+    <span class="n">await</span> <span class="n">game</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="n">_id</span><span class="p">,</span> <span class="p">...);</span>
+    <span class="n">var</span> <span class="n">boundTarget</span> <span class="p">=</span> <span class="n">await</span> <span class="n">_channel</span><span class="p">.</span><span class="nf">BindActorOrOpenChannel</span><span class="p">(</span>
+        <span class="n">game</span><span class="p">.</span><span class="nf">CastToIActorRef</span><span class="p">(),</span> <span class="k">new</span><span class="p">[]</span> <span class="p">{</span> <span class="k">new</span> <span class="nf">TaggedType</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">IGamePlayer</span><span class="p">),</span> <span class="n">_id</span><span class="p">)</span> <span class="p">},</span>
+        <span class="n">ActorBindingFlags</span><span class="p">.</span><span class="n">OpenThenNotification</span> <span class="p">|</span> <span class="n">ActorBindingFlags</span><span class="p">.</span><span class="n">CloseThenNotification</span><span class="p">,</span>
+        <span class="s">"GameGateway"</span><span class="p">,</span> <span class="n">_id</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">boundTarget</span><span class="p">.</span><span class="n">Cast</span><span class="p">&lt;</span><span class="n">GamePlayerRef</span><span class="p">&gt;();</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>After client receives connection information from server, it establishes new connection to reach GameActor
+and commuicate with it as a regular actor.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="n">var</span> <span class="n">gamePlayer</span> <span class="p">=</span> <span class="n">User</span><span class="p">.</span><span class="nf">JoinGame</span><span class="p">(</span><span class="n">gameId</span><span class="p">,</span> <span class="p">...);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">gamePlayer</span><span class="p">.</span><span class="nf">IsChannelConnected</span><span class="p">()</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span>
+    <span class="n">await</span> <span class="n">gamePlayer</span><span class="p">.</span><span class="nf">ConnectChannelAsync</span><span class="p">();</span>
+<span class="n">gamePlayer</span><span class="p">.</span><span class="nf">CallSomething</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<h5 id="bind-multiple-interfaceds-to-a-bound-actor">Bind multiple interfaceds to a bound actor</h5>
+
+<p>Bound actor to channel could be accessed via one bound interface. (Not means that actor can implement only one interface.)
+It changed to bind multiple interfaced to an actor and the following use case can be implemented with this feature.</p>
+
+<p>For example, <code class="highlighter-rouge">UserActor</code> has two kinds of permission to access. Normal access and administrative access.
+Normal access is only permitted before client is confirmed to have an administrative priviledge.
+At first, write <code class="highlighter-rouge">UserActor</code> implementing <code class="highlighter-rouge">IUser</code> and <code class="highlighter-rouge">IUserForAdmin</code> as separate methods by permission and
+bind only <code class="highlighter-rouge">IUser</code> to bound user actor.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserActor</span> <span class="p">:</span> <span class="n">IInterfacedActor</span><span class="p">,</span> <span class="n">IUser</span><span class="p">,</span> <span class="n">IUserForAdmin</span> <span class="p">{</span>
+    <span class="n">Task</span> <span class="n">IUser</span><span class="p">.</span><span class="nf">NormalMethod</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
+    <span class="n">Task</span> <span class="n">IUserForAdmin</span><span class="p">.</span><span class="nf">PowerMethod</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>After verifying client is an administrator, tell channel to allow a client to access <code class="highlighter-rouge">IUserForAdmin</code> methods
+by binding <code class="highlighter-rouge">IUserForAdmin</code> to bound actor. After binding, client can access methods of <code class="highlighter-rouge">IUserForAdmin</code>.</p>
+
+<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="n">Task</span> <span class="nf">Authorize</span><span class="p">(...)</span> <span class="p">{</span>
+    <span class="n">await</span> <span class="n">_channel</span><span class="p">.</span><span class="nf">BindType</span><span class="p">(</span><span class="n">Self</span><span class="p">,</span> <span class="k">new</span> <span class="n">TaggedType</span><span class="p">[]</span> <span class="p">{</span> <span class="k">typeof</span><span class="p">(</span><span class="n">IUserForAdmin</span><span class="p">)</span> <span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h4 id="example-works">Example works</h4>
+
+<p>Writing examples has been an important part through the whole development process.
+In developing libraries, it could be the first way to make sure it works well and
+show how easy programmer can write features that libraries want to help with.
+And it let me know what is missing and what is bad quickly. 
+Also it is really helpful to let newcomer understand how the library works and learn best practices.
+Because of this several advantages, I have been updating examples even it costs tons of efforts.</p>
+
+<h5 id="keep-reference-applications-up-to-date">Keep reference applications up-to-date</h5>
+
+<p>There are three reference applications: <a href="https://github.com/SaladLab/Chatty">Chatty</a>,
+<a href="https://github.com/SaladLab/TicTacToe">TicTacToe</a>, <a href="https://github.com/SaladLab/Snake">Snake</a>.
+These have been updated by the changes of library. (More hours were spent than expected)</p>
+
+<p>These three diffrent applications share common parts and help for extracting common reusable parts.
+In this period, <a href="https://github.com/SaladLab/Aim.ClusterNode">Aim.ClusterNode</a> are written for covering
+common cluster node behaviours.</p>
+
+<p>Also all servers in application can run as a service now.</p>
+
+<h5 id="project-scaffolding">Project scaffolding</h5>
+
+<p>New tool, <a href="https://github.com/SaladLab/Akka.ProjectScaffolding">Akka.ProjectScaffolding</a> is introduced
+to help for initiating new project with akka.net and unity.
+For building online game, at least 3 projects should be created and many libraries have to be installed and configurated,
+which are boring and time-consuming. At first, Visual Studio <a href="https://msdn.microsoft.com/en-us/library/ms185301.aspx">Project Template</a> 
+was being considered but it is not easy to support other IDEs such as Visual Sutio Code and to maintain template project without burden
+so standalone scaffolding tool was chosen.</p>
+
+<p>Run a program from <a href="https://github.com/SaladLab/Akka.ProjectScaffolding/releases">Release</a> and
+it will create new project configured to work on right now. Following command generates new project using cluster.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>akka-unity-cluster NewProjectName
+</code></pre>
+</div>
+
+<h4 id="writing-test-and-documentation">Writing test and documentation</h4>
+
+<p>Tests and documentation which were skipped because of a rapid development are written.
+For tests, writing test itself is not hard, whereas building testing environment is sometimes really hard.
+And writing documentation is always difficult. :)</p>
+
+<p>New tests</p>
+
+<ul>
+  <li><a href="https://github.com/SaladLab/Akka.Interfaced/tree/master/core/CodeGenerator.Tests">Akka.Interfaced CodeGenerator</a> :
+Make simple test code for verifying result code not by comparing generated code source but by analyzing generated semantic trees.</li>
+  <li><a href="https://github.com/SaladLab/Akka.Interfaced.SlimSocket/tree/master/core/Akka.Interfaced.SlimSocket.Tests">Akka.Interfaced.SlimSocket</a> :
+It was impossible to write test code because SlimClient and Akka.Interfaced were mutual exclusive but it became possible to write after removing SlimClient project.</li>
+</ul>
+
+<p>New documentation</p>
+
+<ul>
+  <li><a href="https://github.com/SaladLab/Akka.Interfaced/blob/master/docs/Manual.md">Akka.Interfaced Manual</a></li>
+</ul>
+
+<h3 id="futher-work">Futher work</h3>
+
+<p>These are short summary that want to be implemented. But when and how are not determined.</p>
+
+<h4 id="encrypting-udp-communication">Encrypting UDP communication</h4>
+
+<p>Add encryption to UDP communication. UDP channel identifies each connection by connection ID (not endpoint)
+so someone can insert a malicious packet into other’s connection if he can guess connection ID and sequence number.
+To prevent this, encryption have to be adopted.
+For the same reason, <a href="https://en.wikipedia.org/wiki/QUIC">QUIC</a> specifies that TLS/SSL is mandatory for keeping connection safe.</p>
+
+<h4 id="wire-instead-of-protobufnet">Wire instead of Protobuf.NET</h4>
+
+<p>SlimSocket uses <a href="https://github.com/mgravell/protobuf-net">protobuf-net</a> for a message serializer. 
+Because of limits of protobuf, it is practically impossible to use inheritance and generic for serializing a message.
+Also protobuf-net always make a empty container variable null, which surprises a programmer. (maybe me alone?)
+To alleviate this problem, alternative serializer can be used such as <a href="https://github.com/akkadotnet/Wire">wire</a>.</p>
+
+<h4 id="distributed-actortable">Distributed ActorTable</h4>
+
+<p>Current implementation <a href="https://github.com/SaladLab/Akka.Cluster.Utility/blob/master/docs/DistributedActorTable.md">DistributedActorTable</a>
+at <a href="https://github.com/SaladLab/Akka.Cluster.Utility">Akka.Cluster.Utility</a> provides a distribued actor table across cluster nodes.
+But table should be placed at one node, which make this SPOF/B.
+To make fault tolerant distributed system, this table should be improved.</p>
+
+<h4 id="net-core-support">.NET Core Support</h4>
+
+<p>Let’s support .NET Core which is the future of .NET. It provides a lot of benefits such as
+hosting services on Linux or Windows nano server. But we need to wait for all dependent libraries to
+support .NET core first.</p>
+
+<h3 id="closing">Closing</h3>
+
+<p>All these works were estimated for my 1 month work but turned out 2 months. :cry:
+But I finished all planned works and I’m happy about it.</p>
+
+  </div>
+
+  <div class="social-share">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+       data-url="http://veblush.github.io/posts/akkanet-online-game-works-for-the-last-2-months/"
+       data-text="Online game server works on Akka.NET for the last 2 months" data-via="veblush" data-count="horizontal">Share on Twitter</a>
+  </div>
+
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  var disqus_loaded = false;
+  var disqus_config = function ()
+  {
+    this.language = "en";
+  };
+  function load_disqus()
+  {
+    disqus_loaded = true;
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = "http://veblush.disqus.com/embed.js";
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }
+  setTimeout(load_disqus, 1000);
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+</div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+      </div>
+
+      <div class="footer">
+        Feed via <a href="/feed.xml">RSS</a>.
+        Powered by <a href="http://jekyllrb.com">Jekyll</a>.
+        Theme is based on
+        <a href="https://github.com/nithinbekal/nithinbekal.github.io/">this</a>.
+      </div>
+    </div>
+    
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-77522665-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>
