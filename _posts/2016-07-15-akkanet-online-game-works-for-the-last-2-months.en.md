@@ -81,7 +81,7 @@ public class GreeterActor : InterfacedActor<GreeterActor>, IGreeter {
 
 But this pattern causes programmer make a silly mistake like providing a wrong generic parameter.
 For previous case, wrong base class such as `InterfacedActor<GuestActor>` cannot prevent compiler to build it
-but will throw runtime exception. It's not good for safe programming environment so improved like following.
+but will throw runtime exception. It's not good for safe programming environment so it's improved like following.
  
 ```csharp
 public class GreeterActor : InterfacedActor, IGreeter {
@@ -152,7 +152,7 @@ Related issue: [Let observer handler work with ExtendedHandler and Filter like I
 ###### Terse SlimClient API
 
 SlimClient does not depend on Akka.NET to make actors accessible from clients outside of Akka.NET.
-Because `ActorRef` for SlimClient is imeplemented quite differently, interpretation is required to
+Because `ActorRef` for SlimClient is implemented quite differently, interpretation is required to
 send and receive `InterfacedActorRef` and `InterfacedObserver` across the boundary between SlimClient and Akka.NET.
  
 For example, following code shows IUserLogin.Login which gets an observer created at SlimClient and
@@ -187,7 +187,7 @@ Single TCP channel has been extended.
 
 ##### UDP Support
 
-UDP channel is introduced in addition to UDP. Rationale for adding UDP channnel is:
+UDP channel is introduced in addition to TCP. Rationale for adding UDP channnel is:
 
 - HandOver: There is an issue on TCP for handling handover on mobile environment.
   To make it happen, reliable data transfer layer should be implemented on top of TCP.
@@ -204,7 +204,7 @@ even it is not designed for server environment because writing robust communicat
 takes lots of effort. Just [forked](https://github.com/SaladLab/LidgrenUdpNet) it and updated it to meet my own requirements.
 Following works are done.
 
-- Support Add .NET 3.5 to nuget package: [LidgrenUdpNet](https://www.nuget.org/packages/LidgrenUdpNet/)
+- Support .NET 3.5 for nuget package: [LidgrenUdpNet](https://www.nuget.org/packages/LidgrenUdpNet/)
 - Support UnityPackage: [LidgrenUdpNet for Unity3D](https://github.com/SaladLab/LidgrenUdpNet/releases)
 - Add fast message handler.
 - Connection is defined not by EndPoint but by ConnectionID to allow hand-over between WiFi and 3G.
@@ -255,10 +255,10 @@ if (gamePlayer.IsChannelConnected() == false)
 gamePlayer.CallSomething();
 ```
 
-##### Bind multiple interfaceds to a bound actor
+##### Bind multiple interfaces to a bound actor
 
 Bound actor to channel could be accessed via one bound interface. (Not means that actor can implement only one interface.)
-It changed to bind multiple interfaced to an actor and the following use case can be implemented with this feature.
+It changed to bind multiple interfaces to an actor and the following use case can be implemented with this feature.
 
 For example, `UserActor` has two kinds of permission to access. Normal access and administrative access.
 Normal access is only permitted before client is confirmed to have an administrative priviledge.
@@ -320,8 +320,8 @@ akka-unity-cluster NewProjectName
 
 #### Writing test and documentation
 
-Tests and documentation which were skipped because of a rapid development are written.
-For tests, writing test itself is not hard, whereas building testing environment is sometimes really hard.
+Some tests and documentationwere skipped because of a rapid development. Missing parts have been written.
+For tests, writing test itself is a little bit easy, whereas building testing environment is sometimes really hard.
 And writing documentation is always difficult. :)
 
 New tests
