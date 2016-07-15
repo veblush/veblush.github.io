@@ -133,7 +133,7 @@ CRTP is convenient to handle this because generic class always allocate new stat
 
 <p>But this pattern causes programmer make a silly mistake like providing a wrong generic parameter.
 For previous case, wrong base class such as <code class="highlighter-rouge">InterfacedActor&lt;GuestActor&gt;</code> cannot prevent compiler to build it
-but will throw runtime exception. It’s not good for safe programming environment so improved like following.</p>
+but will throw runtime exception. It’s not good for safe programming environment so it’s improved like following.</p>
 
 <div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">GreeterActor</span> <span class="p">:</span> <span class="n">InterfacedActor</span><span class="p">,</span> <span class="n">IGreeter</span> <span class="p">{</span>
     <span class="p">...</span>
@@ -206,7 +206,7 @@ But programmers expect that these kinds of message are equally supported so same
 <h6 id="terse-slimclient-api">Terse SlimClient API</h6>
 
 <p>SlimClient does not depend on Akka.NET to make actors accessible from clients outside of Akka.NET.
-Because <code class="highlighter-rouge">ActorRef</code> for SlimClient is imeplemented quite differently, interpretation is required to
+Because <code class="highlighter-rouge">ActorRef</code> for SlimClient is implemented quite differently, interpretation is required to
 send and receive <code class="highlighter-rouge">InterfacedActorRef</code> and <code class="highlighter-rouge">InterfacedObserver</code> across the boundary between SlimClient and Akka.NET.</p>
 
 <p>For example, following code shows IUserLogin.Login which gets an observer created at SlimClient and
@@ -241,7 +241,7 @@ It is not a transparent API and makes bloated code.</p>
 
 <h5 id="udp-support">UDP Support</h5>
 
-<p>UDP channel is introduced in addition to UDP. Rationale for adding UDP channnel is:</p>
+<p>UDP channel is introduced in addition to TCP. Rationale for adding UDP channnel is:</p>
 
 <ul>
   <li>
@@ -264,7 +264,7 @@ takes lots of effort. Just <a href="https://github.com/SaladLab/LidgrenUdpNet">f
 Following works are done.</p>
 
 <ul>
-  <li>Support Add .NET 3.5 to nuget package: <a href="https://www.nuget.org/packages/LidgrenUdpNet/">LidgrenUdpNet</a></li>
+  <li>Support .NET 3.5 for nuget package: <a href="https://www.nuget.org/packages/LidgrenUdpNet/">LidgrenUdpNet</a></li>
   <li>Support UnityPackage: <a href="https://github.com/SaladLab/LidgrenUdpNet/releases">LidgrenUdpNet for Unity3D</a></li>
   <li>Add fast message handler.</li>
   <li>Connection is defined not by EndPoint but by ConnectionID to allow hand-over between WiFi and 3G.</li>
@@ -316,10 +316,10 @@ and commuicate with it as a regular actor.</p>
 </code></pre>
 </div>
 
-<h5 id="bind-multiple-interfaceds-to-a-bound-actor">Bind multiple interfaceds to a bound actor</h5>
+<h5 id="bind-multiple-interfaces-to-a-bound-actor">Bind multiple interfaces to a bound actor</h5>
 
 <p>Bound actor to channel could be accessed via one bound interface. (Not means that actor can implement only one interface.)
-It changed to bind multiple interfaced to an actor and the following use case can be implemented with this feature.</p>
+It changed to bind multiple interfaces to an actor and the following use case can be implemented with this feature.</p>
 
 <p>For example, <code class="highlighter-rouge">UserActor</code> has two kinds of permission to access. Normal access and administrative access.
 Normal access is only permitted before client is confirmed to have an administrative priviledge.
@@ -381,8 +381,8 @@ it will create new project configured to work on right now. Following command ge
 
 <h4 id="writing-test-and-documentation">Writing test and documentation</h4>
 
-<p>Tests and documentation which were skipped because of a rapid development are written.
-For tests, writing test itself is not hard, whereas building testing environment is sometimes really hard.
+<p>Some tests and documentationwere skipped because of a rapid development. Missing parts have been written.
+For tests, writing test itself is a little bit easy, whereas building testing environment is sometimes really hard.
 And writing documentation is always difficult. :)</p>
 
 <p>New tests</p>
